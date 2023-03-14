@@ -49,4 +49,8 @@ http {
 ```
 
 ### Use nginx for okta authentication
-https://docs.nginx.com/nginx/deployment-guides/single-sign-on/okta/
+- https://docs.nginx.com/nginx/deployment-guides/single-sign-on/okta/ : This is using nginx plus which is advanced and paid version of open source nginx
+
+- Integrate Okta : https://developer.okta.com/blog/2018/08/28/nginx-auth-request
+
+- Build your own version from source code: https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/
