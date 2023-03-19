@@ -52,4 +52,22 @@ Increasing resources in order to accomodate higher read/write traffic on DB.
 ## Master slave architectire
 Master serves write requests and critical read requests while there are other read replicas which is only useful for 
 
-## Choose Right Database
+## Databases
+
+1) MySQL
+- #SQL #ACID 
+
+2) PostgreSQL
+- #SQL #ACID
+
+3) MongoDB
+- #NoSQL #ACID
+
+4) Cassandra
+- #NoSQL #ACID
+- written in Java
+- JVM paused execution while garbege collection
+
+5) ScyllaDB
+- #NoSQL #ACID
+- Cassandra compatible DB written in C++
