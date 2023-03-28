@@ -30,7 +30,6 @@ sudo nginx -s reload          # reload the Nginx configuration
 $http_authorization is an nginx variable that contains the value of the HTTP Authorization header from the client's request.
 
 ```nginx
-
 events {
     worker_connections  1024;
 }
@@ -48,9 +47,46 @@ http {
 }
 ```
 
+
+### Configurations and Architecture
+
+#### Processes
+By default, *Nginx starts one master process and one worker process.* The master process is responsible for managing worker processes, while the worker process handles incoming connections.
+
+*Master process:*
+The master process is responsible for reading the configuration file and starting worker processes. It also monitors worker processes and restarts them if they crash.
+
+*Worker process:* 
+Each worker process handles incoming connections and serves requests. By default, Nginx starts one worker process, but you can increase this number by setting the worker_processes directive in the nginx.conf file.
+
+#### worker_connections
+> No. of max connections a single process can open simultaneously.
+
+worker_connections is a configuration directive in the Nginx web server that determines the maximum number of connections that can be opened simultaneously by each worker process.
+
+Here's how it works:
+
+Nginx uses a multi-process architecture, where multiple worker processes handle incoming connections. When a client makes a request to the server, one of the worker processes accepts the connection and serves the request.
+
+The worker_connections directive specifies the maximum number of simultaneous connections that each worker process can handle. For example, if you set worker_connections to 1024, each worker process can handle up to 1024 connections at the same time.
+
+It's important to set this value carefully, as it can affect the server's performance and stability. If you set worker_connections too low, your server may not be able to handle a high volume of incoming connections, which can lead to slow response times or dropped connections. On the other hand, if you set worker_connections too high, your server may run out of system resources such as file descriptors or sockets, which can cause it to crash.
+
+In general, you should set worker_connections based on the amount of memory and processing power available on your server, as well as the expected volume of incoming connections. It's also a good idea to monitor your server's resource usage and adjust worker_connections as needed to ensure optimal performance.
+
+#### proxy_pass
+proxy_pass is an Nginx directive that is used to redirect client requests to a backend server. It is often used to set up reverse proxy servers that act as intermediaries between clients and backend servers.
+
+#### Variables in nginx
+- $remote_addr: IP address of the client that made the request.
+- $proxy_add_x_forwarded_for : used to add the IP address of the client to the X-Forwarded-For header when proxying requests.
+- $scheme : Nginx variable that represents the scheme (protocol) of the request (e.g. http or https).
+- 
+
 ### Use nginx for okta authentication
 - https://docs.nginx.com/nginx/deployment-guides/single-sign-on/okta/ : This is using nginx plus which is advanced and paid version of open source nginx
 
 - Integrate Okta : https://developer.okta.com/blog/2018/08/28/nginx-auth-request
 
 - Build your own version from source code: https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/
+
