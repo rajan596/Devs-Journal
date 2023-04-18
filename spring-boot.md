@@ -24,6 +24,12 @@ In Spring, the @Service annotation is used to indicate that a particular class i
 
 The @Service annotation is one of several annotations in the Spring framework that are used to manage components in a Spring application. Other common annotations include @Controller, @Repository, and @Component.
 
+### @Component
+Components are used to define a class as a **Spring-managed bean**. These are typically used to create objects that provide some functionality or behavior that can be injected into other parts of the application. The @Component annotation is the base annotation for all Spring-managed components, and other annotations such as @Controller, @Repository, and @Service are specialized variants of @Component.
+
+components are Spring-managed beans that provide specific functionality or behavior, while services are higher-level constructs that encapsulate business logic and may use one or more components to provide their functionality.
+
+
 ### @AutoWired
 In Spring, the @Autowired annotation is used to automatically wire (inject) dependencies into a Spring-managed bean. Dependencies refer to other Spring-managed beans that a bean depends on to perform its functionality.
 
