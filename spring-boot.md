@@ -48,3 +48,7 @@ In Mockito, the @InjectMocks annotation is used to inject mock objects into a cl
 When a class is marked with the @InjectMocks annotation, Mockito will attempt to inject any objects annotated with @Mock or @Spy into the class being tested. This can help simplify the process of setting up test cases by automatically creating and injecting mock objects where needed.
 
 @InjectMocks only works with fields, not constructor or setter injection. 
+
+### @ExtendWith / @SpringBootTest
+If you are using JUnit 4, do not forget to also add @RunWith(SpringRunner.class) to your test, otherwise the annotations will be ignored. If you are using JUnit 5, there is no need to add the equivalent @ExtendWith(SpringExtension.class) as @SpringBootTest and the other @…​Test annotations are already annotated with it.
+
