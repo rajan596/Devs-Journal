@@ -20,7 +20,7 @@ https://en.wikipedia.org/wiki/Single-responsibility_principle
 
 ## Liskov substitution principle
 - **Applies on subclass - inheritance**
-- Each subclass should be substitutable for its parent class. It should only extend its functionality rather than overriding it…
+- Each subclass should be substitutable for its parent class. It should **only extend its functionality rather than overriding** it…
 - Like Square should not be subclass of Rectangle since it does not have properties called width and height. For square both are same. So rather it should be a parallel class not inherited one.
 - The Liskov substitution principle simply implies that when an instance of a class is passed/extended to another class, the inheriting class should have a use case for all the properties and behavior of the inherited class.
 
