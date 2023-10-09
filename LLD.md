@@ -1,3 +1,34 @@
+# Overview
+* SOLID Principle
+* Design Patterns
+    * Creational Patterns
+        * Factory
+        * Abstract Factory
+        * Builder
+        * Prototype
+        * Singleton
+    * Structural Patterns
+        * Adaptor
+        * Bridge
+        * Composite
+        * Decorator
+        * facade
+        * Flyweight
+        * Proxy
+    * Behavioral Patterns
+        * Chain of Responsibility
+        * Command
+        * Iterator
+        * Mediator
+        * Memento
+        * Observer
+        * State
+        * Strategy
+        * Template
+        * Visitor
+
+![Alt text](./assets/images/design-patterns.png)
+Credits: https://refactoring.guru/design-patterns/catalog
 
 # SOLID Principle
 https://www.freecodecamp.org/news/solid-principles-single-responsibility-principle-explained/
@@ -156,10 +187,11 @@ Symbols used in class diagrams
 
 
 
-References
-LLD primer: https://github.com/prasadgujar/low-level-design-primer/blob/master/solutions.md
-Command Design Pattern : https://medium.com/@learncsdesign/learn-the-command-design-pattern-60cad5b85e34
-https://www.tutorialspoint.com/design_pattern/
+# References
+- LLD primer: https://github.com/prasadgujar/low-level-design-primer/blob/master/solutions.md
+- Command Design Pattern : https://medium.com/@learncsdesign/learn-the-command-design-pattern-60cad5b85e34
+- https://www.tutorialspoint.com/design_pattern/
+- https://refactoring.guru/design-patterns/catalog
 
 
 
