@@ -2,30 +2,31 @@
 * SOLID Principle
 * Design Patterns
     * Creational Patterns
-        * Factory : creates and returns a new obj based on argument
-        * Abstract Factory : factory of factory
-        * Builder : Builds complex object 
-        * Prototype : to create duplicate object
-        * Singleton : Single object of a class.
+        1. **Factory** : creates and returns a new obj based on argument
+        2. Abstract Factory : factory of factory
+        3. **Builder** : Builds complex object 
+        4. Prototype : to create duplicate object
+        5. **Singleton** : Single object of a class.
     * Structural Patterns : How more than one class/objects are structured
-        * Adaptor
-        * Bridge
-        * Composite
-        * Decorator
-        * facade
-        * Flyweight
-        * Proxy
+        1. **Adaptor**
+        2. Bridge
+        3. Composite
+        4. Decorator
+        5. facade
+        6. Flyweight
+        7. Proxy
     * Behavioral Patterns : How more than one objects communicate with each other
-        * Chain of Responsibility
-        * Command
-        * Iterator
-        * Mediator
-        * Memento
-        * Observer
-        * State : When system can have multiple states
-        * Strategy
-        * Template
-        * Visitor
+        1. Chain of Responsibility
+        2. Command
+        3. Iterator
+        4. Interpreter
+        5. Mediator
+        6. Memento
+        7. **Observer**
+        8. **State** : When system can have multiple states
+        9. **Strategy**
+        10. Template
+        11. Visitor
 
 ![Alt text](./assets/images/design-patterns.png)
 Credits: https://refactoring.guru/design-patterns/catalog
@@ -96,8 +97,61 @@ Useful to wrap out main method from client and put explicit sanity checks/ valid
 These patterns are concerned with algorithms and the assignment of responsibilities between objects.
 
 ### Strategy Pattern
-Deciding behavior class based on input
-A strategy pattern is an operational pattern.
+Deciding behavior class based on strategy.
+A strategy pattern is an **behavoral pattern**.
+Definition as per Head First
+> The Strategy Pattern defines a family of algorithms, encapsulates each one, and makes them interchangeable. Strategy lets the algorithm vary independetly from clients tha use it.
+
+Examples:
+Lets say client application need to perform cloud upload operations.\
+The upload can be done via Azure, AWS, Google or any Data storage service based on requirement. \
+In this case a different upload is considered as **Upload Strategy** which should be abstracted out from client.
+
+In the below example client class need not worry about addition of new strategy or change in any of the strategy of File Upload.
+
+```java
+/* Client class */
+class ProcessData {
+ IFileupload fileUpload; // Coding to an abstraction rather than implementation
+
+ void process(FileUploadRequest request, FileUploadServices fileUploadService){
+    fileUpload = FileUploadStrategies.get(fileUploadService).upload();
+ }
+}
+
+enum FileUploadService { AWS, AZURE, GOOGLE}
+
+class IFileupload { void upload(FileUploadRequest request); }
+class AzureFileUpload implements IFileupload{
+    void upload(FileUploadRequest request);
+}
+class AWSFileUpload implements IFileupload{
+    void upload(FileUploadRequest request);
+}
+class GoogleCloudFileUpload implements IFileupload{
+    void upload(FileUploadRequest request);
+}
+
+/**
+ * This class returns strategy based on request
+ * **/
+class FileUploadStrategies {
+    void get(FileUploadService service){
+        switch(service) {
+            case AWS:
+                return new AWSFileUpload();
+                break;
+            case AZURE:
+                return new AzureFileUpload();
+                break;
+            case GOOGLE:
+                return new GoogleCloudFileUpload();
+                break;        
+        }
+    }
+}
+
+```
 
 ### Observer Pattern
 One data source object notifies all observers regarding data change. Observers can be added and removed at any time
@@ -166,6 +220,24 @@ Think about concurrency in LLD interview
     - Think about the behaviors of entities
     - Checking our common behaviors and specific behaviors also helps identifying Interfaces and inheritance
     - See Inheritance vs Composition
+2. Identify the aspects of your application which varies and separate them from what stays the same
+    - Take the part that varies and encapsulate them so that later that part can be changed independently.
+3. Program to an interface, not an implementation
+    - It doesn't mean to use java Interface only but rather use supertype of the behavioral classes usually abstract class or Interface
+        ```java
+            class NonPreferredImplmentation {
+               SHAHashAlgorithm shaHashAlgo;
+            }
+
+            class RecommendedImplementation {
+                IHashAlgorithm hashAlgorithm;
+            }
+
+            class SHAHashAlgorithm implementa IHashAlgorithm {}
+        ```
+4. Favor composition over inheritance.
+    - Has-A can be better than Is-A
+    - 
 
 # References
 - LLD primer: https://github.com/prasadgujar/low-level-design-primer/blob/master/solutions.md
