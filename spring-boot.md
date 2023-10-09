@@ -99,3 +99,15 @@ When a class is marked with the @InjectMocks annotation, Mockito will attempt to
 ### @ExtendWith / @SpringBootTest
 If you are using JUnit 4, do not forget to also add @RunWith(SpringRunner.class) to your test, otherwise the annotations will be ignored. If you are using JUnit 5, there is no need to add the equivalent @ExtendWith(SpringExtension.class) as @SpringBootTest and the other @…​Test annotations are already annotated with it.
 
+### How to create annotation ?
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface MyInterface {
+} 
+
+Retention: How long the annotation should be retained ?
+public enum RetentionPolicy {SOURCE, CLASS, RUNTIME}
+
+Target : Where the annotation can be used ? like field, method, constructor, etc
+
