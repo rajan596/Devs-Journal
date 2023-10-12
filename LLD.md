@@ -72,10 +72,47 @@ One of the way to achieve this is Factory pattern
 Provides **object creation** patterns.
 
 ### Factory pattern
-A factory pattern is a creational pattern. Put another way, a factory pattern is used to create objects of a specific type. A strategy pattern is use to perform an operation (or set of operations) in a particular manner
+- A factory pattern is a creational pattern. 
+Put another way, a factory pattern is used to create objects of a specific type. 
+A strategy pattern is use to perform an operation (or set of operations) in a particular manner
+- When implementation class has code to initialize multiple concrete classes based on requirement/input its not **closed for modification**. Any new introduction of concrete class or change required this class to be re-opened.
+- Helps in - Dependency inversion Principle as Both highlevel and Level objects can depend on abstractions.
+
+** To solve this problem** Factory pattern comes into the picture.
+
+- this helps with the principle: *"Identify the aspects that vary and separate them from what stays the same"*
 
 ### Abstract Factory pattern 
-Factory of factory
+- Factory of factory : One factory initializes another factory.
+- For Country, Pizza: First factory gets country specific object and the country specific object then gets concrete pizzas.
+- Encapsulated object creation
+- provides a way to create all object at one place. Helps avoid duplication.
+
+> The factory method pattern defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory methos lets a class defer instantiation to subclasses.
+
+```java
+
+interface IPizza {}
+class Margaritta implements IPizza {}
+
+class INPizzaFactory(){
+    if pizzaType = "Margaritta" : return new Margaritta();
+}
+class USPizzaFactory(){}
+class IRPizzaFactory(){}
+
+class CountryPizzaFactory {
+    if country == "IN" : return new INPizzaFactory(pizzaType);
+    if country == "US" : return new USPizzaFactory(pizzaType);
+    ....
+}
+
+class Client {
+    IPizza pizza = PizzaFactory.getPizzaFor("IN", "Margaritta");
+    pizza.order();
+}
+
+```
 
 ### Builder pattern
 If you find yourself in a situation where you keep on adding new parameters to a constructor, resulting in code that becomes error-prone and hard to read, perhaps it's a good time to take a step back and consider refactoring your code to use a Builder.
@@ -230,8 +267,14 @@ class HelperClass {
 ### Decorator Pattern
 - Attaches additional responsibility to object at run time.
 - Allows us to add some behaviour at run time without re-compiling.
+- Follows Open-close principle
+- the decorator is a wrapper around concrete components or another decorator.
 
 > The Decorator Pattern attaches additional responsibilities to an object dynamically. **Decorators provide a flexible alternative to subclassing for extending functionality.**
+
+![Alt text](./assets/images/decorator-pattern.png)
+
+Credits: https://medium.com/maestral-solutions/the-decorator-detailed-look-at-design-pattern-e7bfec64663b
 
 When to use: some set of concrete classes can use a combination of additional features or functionality which can be added at run time.
 It **wraps concrete class** and becomes wrapper to it by adding its own functionality like.\
