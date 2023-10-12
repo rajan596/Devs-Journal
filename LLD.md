@@ -154,17 +154,164 @@ class FileUploadStrategies {
 ```
 
 ### Observer Pattern
-One data source object notifies all observers regarding data change. Observers can be added and removed at any time
-Here subject and observers are loosely coupled.
+One data source object notifies all observers regarding data change. Observers can be added and removed at any time.
+This is one of the most heavily used pattern in JDK. \
+This pattern a very good example of loosely coupled objects.
+
+In this pattern there are 2 types of object
+1. Notifier/Publisher: A class which notifies of any state change to all subscribers
+2. Subscribers: Which listens to the notifier and processed the data to do its relevant processing.
+
+Here additional functionalities added to support behaviour is
+1. Subscriber can subscriber to specific type of event
+2. Subscriber can unsubscribe
+3. Notifier can notify of any event change.
+
+One good example is UI components. We can add observers for button click and button can notify interested subscribers.
+
+Definition
+> The Observer Pattern defines a 1:Many dependency between objects so that when one object changes state, all of its dependents are notified and updates automatically
+
+```java
+interface Observer { void stateChanged(Object event); }
+interface Notifier { 
+    void notify(); 
+    void registerObserver(Observer observer); 
+    void removeObserver(Observer observer);
+}
+
+class FileChangedNotifier implements Notifier {
+
+    List<Observer> observers = new Observers();
+
+    fileChangedListener.onFileChanged(()->{
+        notify();
+    });
+
+    void notify(){
+        for(Observer observer: observers){
+            observer.stateChanged(someRelevantObject);
+        }
+    }
+
+    void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    void removeObserver(Observer observer){
+        observers.remove(observer);
+    }
+
+}
+
+class IAmObserver implements Observer {
+
+    @override
+    void stateChanged(Object event){
+        // handling for the state changed notification goes here
+    }
+}
+
+class HelperClass {
+    Notifier notifier = new FileChangedNotifier();
+    Observer observer = new IAmObserver();
+
+    // Registering observer
+    notifier.registerObserver(observer);
+
+    notifier.fileChanged();
+
+    // Removing observer
+    notifier.removeObserver(observer);
+}
+
+```
 
 ### Decorator Pattern
-Attaches additional responsibility to object at run time
-When to use: some set of concrete classes can use a combination of additional features or functionality which can be added at run time.
-It wraps concrete class and becomes wrapper to it by adding its own functionality like 
-Pizza pizza = new CheeseToppings(new Margarita())
-Cons: Adds lot more small sub classes
-Example:
+- Attaches additional responsibility to object at run time.
+- Allows us to add some behaviour at run time without re-compiling.
 
+> The Decorator Pattern attaches additional responsibilities to an object dynamically. **Decorators provide a flexible alternative to subclassing for extending functionality.**
+
+When to use: some set of concrete classes can use a combination of additional features or functionality which can be added at run time.
+It **wraps concrete class** and becomes wrapper to it by adding its own functionality like.\
+The decorator adds its own behavior either before and/or after delegating to the object it decorates to do rest of the work.
+In other words it extends class to be decorated (wrap), override its behaviour with additional of child class's behaviour.
+
+Cons: Adds lot more small sub classes
+
+Example:
+```java
+Pizza pizza = new CheeseToppings(new Margarita())
+
+// Real world Example from Java
+FileInputStream fStream = new FileInputStream(); // txt file
+fStream = new BufferedInputStream(fStream);      // concret Decorator. Addition of functionality: line read
+fStream = new LineNumberInputStream(fStream);   // concrete decorator. Addition of functionality: line no count
+```
+
+Lets first go with famous example of pizzas.\
+There is this pizza which can have N number of toppings as per customer's requirement.\
+Toppings - A,B,C,D,E\
+Imagine what would happen if we try to crerate all possible combinations by ourselves like
+1. A + B
+2. A + C + E
+3. C + D
+4. B
+5. etc etc
+
+Total there can be 2^5 possible combinations i.e, 32. Making 32 classes is insane.
+
+**This is the problem Decorator pattern is trying to solve.**
+
+1) There will be one standard Interface and class for Pizzas
+2) There will be one standard Decorator interface and its various implmenentations of toppings
+
+```java
+// Main objects
+interface IPizza {}
+class MaargaritaPizza implements IPizza {}
+
+// added functionalities on top of above base objects.
+interface IToppingsDecorator {}
+class ToppingsA implements IToppingsDecorator {
+    IPizza pizza; // This holds reference of base objects i.e, pizza
+}
+class ToppingsB implements IToppingsDecorator {
+    IPizza pizza; // This holds reference of base objects i.e, pizza
+}
+class ToppingsC implements IToppingsDecorator {
+    IPizza pizza; // This holds reference of base objects i.e, pizza
+}
+
+// Now Lets say user says Margarita pizza with toppings A and C
+// Pseudo code
+
+IPizza pizza = getBasePizza(userInputForPizza); // returns new MaargaritaPizza()
+
+// now add toppings...
+for(Topping topping: toppingsList){
+    pizza = addNewTopping(pizza, topping)
+}
+
+void addNewTopping(IPizza pizza, Topping topping){
+    switch(topping){
+        case A:
+            pizza = new ToppingsA(pizza);
+            break;
+        case B:
+            pizza = new ToppingsB(pizza);
+            break;
+        case C:
+            pizza = new ToppingsC(pizza);
+            break;
+    }
+    return pizza
+}
+
+```
+
+![Alt text](./assets/images/decorator-example.png)
 
 ## Command Design Pattern
 TODO
@@ -237,7 +384,9 @@ Think about concurrency in LLD interview
         ```
 4. Favor composition over inheritance.
     - Has-A can be better than Is-A
-    - 
+    - One of the problem with Inheritance is that class needs to be inherited. Which is not possible in all the cases.
+5. Strive for loosely coupled designs between objects that interact.
+    - Observer is such pattern
 
 # References
 - LLD primer: https://github.com/prasadgujar/low-level-design-primer/blob/master/solutions.md
