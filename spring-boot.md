@@ -59,17 +59,28 @@ A Spring bean can be defined in a variety of ways, including:
 
 ## Annotations
 
+### @Component
+Components are used to define a class as a **Spring-managed bean**. These are typically used to create objects that provide some functionality or behavior that can be injected into other parts of the application. The @Component annotation is the base annotation for all Spring-managed components, and other annotations such as @Controller, @Repository, and @Service are specialized variants of @Component.
+
+components are Spring-managed beans that provide specific functionality or behavior, while services are higher-level constructs that encapsulate business logic and may use one or more components to provide their functionality.
+
+Component is generic stereotype. 
+> One should use specific stereotypes like **@Controller, @Repository, and @Component** for more specific use cases.
+
+| Annotation | Meaning | 
+| ---------- | ------- | 
+| Component | Generic stereotype | 
+| Repository | Stereotype for persistence layer | 
+| Service | Stereotype for service layer | 
+| Component |  Stereotype for presentation layer - MVC | 
+
 ### @Service
 In Spring, the @Service annotation is used to indicate that a particular class is a **service component** in the application. A service component is a class that performs some specific business logic, such as retrieving data from a database, performing calculations, or calling external APIs.
 
 **When a class is marked with the @Service annotation, Spring will automatically detect it and create an instance of it as a bean in the application context.** This allows other parts of the application to easily access and use the service component through **dependency injection**.
 
-The @Service annotation is one of several annotations in the Spring framework that are used to manage components in a Spring application. Other common annotations include **@Controller, @Repository, and @Component**.
+The @Service annotation is one of several annotations in the Spring framework that are used to manage components in a Spring application. 
 
-### @Component
-Components are used to define a class as a **Spring-managed bean**. These are typically used to create objects that provide some functionality or behavior that can be injected into other parts of the application. The @Component annotation is the base annotation for all Spring-managed components, and other annotations such as @Controller, @Repository, and @Service are specialized variants of @Component.
-
-components are Spring-managed beans that provide specific functionality or behavior, while services are higher-level constructs that encapsulate business logic and may use one or more components to provide their functionality.
 
 ### @Controller
 

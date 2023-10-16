@@ -78,6 +78,8 @@ A strategy pattern is use to perform an operation (or set of operations) in a pa
 - When implementation class has code to initialize multiple concrete classes based on requirement/input its not **closed for modification**. Any new introduction of concrete class or change required this class to be re-opened.
 - Helps in - Dependency inversion Principle as Both highlevel and Level objects can depend on abstractions.
 
+> The factory method pattern defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory methos lets a class defer instantiation to subclasses.
+
 ** To solve this problem** Factory pattern comes into the picture.
 
 - this helps with the principle: *"Identify the aspects that vary and separate them from what stays the same"*
@@ -88,18 +90,19 @@ A strategy pattern is use to perform an operation (or set of operations) in a pa
 - Encapsulated object creation
 - provides a way to create all object at one place. Helps avoid duplication.
 
-> The factory method pattern defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory methos lets a class defer instantiation to subclasses.
+> The Abstract facory pattern provides an interface for creating families of related or dependent objects without specifying their concrest class
 
 ```java
 
 interface IPizza {}
 class Margaritta implements IPizza {}
 
-class INPizzaFactory(){
+interface IFactory {}
+class INPizzaFactory implements IFactory(){
     if pizzaType = "Margaritta" : return new Margaritta();
 }
-class USPizzaFactory(){}
-class IRPizzaFactory(){}
+class USPizzaFactory implements IFactory(){}
+class IRPizzaFactory implements IFactory(){}
 
 class CountryPizzaFactory {
     if country == "IN" : return new INPizzaFactory(pizzaType);
