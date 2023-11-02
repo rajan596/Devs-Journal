@@ -77,10 +77,11 @@ Put another way, a factory pattern is used to create objects of a specific type.
 A strategy pattern is use to perform an operation (or set of operations) in a particular manner
 - When implementation class has code to initialize multiple concrete classes based on requirement/input its not **closed for modification**. Any new introduction of concrete class or change required this class to be re-opened.
 - Helps in - Dependency inversion Principle as Both highlevel and Level objects can depend on abstractions.
+- Relies on *Inheritance*. Object creation is delegated to sub classes which implement factory method to create object.
 
 > The factory method pattern defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory methos lets a class defer instantiation to subclasses.
 
-** To solve this problem** Factory pattern comes into the picture.
+**To solve this problem** Factory pattern comes into the picture.
 
 - this helps with the principle: *"Identify the aspects that vary and separate them from what stays the same"*
 
@@ -89,8 +90,9 @@ A strategy pattern is use to perform an operation (or set of operations) in a pa
 - For Country, Pizza: First factory gets country specific object and the country specific object then gets concrete pizzas.
 - Encapsulated object creation
 - provides a way to create all object at one place. Helps avoid duplication.
+- Relies on: *Object composition* object creation is implemented in methods exposed in the factory methods.
 
-> The Abstract facory pattern provides an interface for creating families of related or dependent objects without specifying their concrest class
+> The Abstract facory pattern provides an interface for creating families of related or dependent objects **without specifying their concrest class**
 
 ```java
 
@@ -126,6 +128,7 @@ Basically concrete class implements Cloneable interface and overrides clone meth
 Clients need not worry when references object using interface/abstract class which actual object being copied. 
 
 ### Singleton design pattern
+
 
 ## Structural Patterns
 These patterns explain how to assemble objects and classes into larger structures while keeping these structures flexible and efficient.
