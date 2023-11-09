@@ -244,9 +244,26 @@ function useMyCustomHook({a,b}){
 ```
 
 ### useReducer
-- When state is having frequent updated in that case redicer can be used to enhance performance
+- When state is having frequent updated in that case reducer can be used to enhance performance
 - Updates state based on actions. State update control is with reducer function.
 
+### useId
+- Generates random string ID 
+
+```js
+const id = useId() # Result-> :r1:
+```
+
+# Routers
+Ref: https://reactrouter.com/en/main/start/tutorial#the-root-route
+
+- <a> tag reloads entire page and re-paints. So, it should not be used in React.
+- **Link** can be used in-place of <a> tag
+- **NavLink** gives some extra features than Link.
+
+```
+npm install react-router-dom
+```
 
 # Thinking in React
 https://react.dev/learn/thinking-in-react
