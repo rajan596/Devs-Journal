@@ -255,17 +255,103 @@ const id = useId() # Result-> :r1:
 ```
 
 # Routers
-Ref: https://reactrouter.com/en/main/start/tutorial#the-root-route
 
-- <a> tag reloads entire page and re-paints. So, it should not be used in React.
-- **Link** can be used in-place of <a> tag
-- **NavLink** gives some extra features than Link.
+> This is a broader topic and a complete information can be found on reactrouter site documentation: https://reactrouter.com/en/main/start/tutorial#the-root-route
 
-```
+Setup:
+```bash
 npm install react-router-dom
 ```
 
+- `a` tag reloads entire page and re-paints. So, it should not be used in React. `Link` can be used in-place of `a` tag
+- `NavLink` gives some extra features than Link.
+
+## Approach : 1 via createBrowserRouter and RouterProvider
+- We need to add routing informationwhere react is rendering data in root element.
+- This will be mainly in index.js or main.js
+- `Outlet` component is where child routes will be rendered. It should be used in parent route element [Ref](https://reactrouter.com/en/main/components/outlet)
+
+```js
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+    <!--  We have removed <App /> from here because now router will decide what to render -->
+  </React.StrictMode>
+);
+
+// Define router
+const router = createBrowserRouter([
+  {
+    path:'/',
+    element: <App />,
+    children : [
+      {
+        path : 'heading',
+        element : <AisUiHeading/>
+      },
+      {
+        path : 'user/:userid', // Dynamic path params passing
+        element : <UserPage/>
+      }
+    ]
+  }
+]);
+
+// Parent component
+function App() {
+
+  return (
+    <>
+      <h1 className="p-4">App Component</h1>
+      <ul>
+        <li><Link to="/" >Home</Link></li>
+        <li><Link to="/heading" >Heading</Link></li>
+         <li><Link to="/user/45" >User</Link></li>
+      </ul>
+      <Outlet /> <-- This is where child route component will be rendered>
+    </>
+  );
+}
+
+```
+
+## Approach 2 via Routes
+- Using Routes component
+
+```js
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Dashboard />}>
+        <Route
+          path="messages"
+          element={<DashboardMessages />}
+        />
+        <Route path="tasks" element={<DashboardTasks />} />
+      </Route>
+    </Routes>
+  );
+}
+```
+
+### loader
+loader in router gives flexibility to call API which is required to populate component in advance i.e, before even mounting component when user hovers on that `Link`
+
+```js
+<Route
+  path="dashboard"
+  element = {<Dashboard />}
+  loader={methodToFetchData}
+/>
+
+/* and then use useLoaderData to fetch this data in component*/
+const data = useLoaderData()
+
+```
+
 # Thinking in React
+
 https://react.dev/learn/thinking-in-react
 
 1. Break the UI in components hierarchy
