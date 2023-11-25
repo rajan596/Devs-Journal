@@ -238,10 +238,47 @@ function useMyCustomHook({a,b}){
 - Problem it solves: Consider a case where parent component holds a state and there are deep nesting of child component and state is passed as *props*.
 - Maintaining state and passing it as props can make maintanance difficult.
 - To solve this problem, useContext can be used. It provides a context where any component can get the state information.
+- It's like global variable for specific use case i.e, context
+- Here we will need to 1) create context and 2) access context data using useContext in react
 
 ```js
-// TODO
+// Create context
+
+// File: UserContext.js
+// This lays down the schema what we need to store in this context.
+export const UserContext = React.createContext({
+  userName: "username",
+  isLoggedIn : false
+})
+
+export const UserContextProvider = UserContext.Provider
+
+/* This hook simplifies and abstracts use of useContext in components where access is required */
+export function useUserData(){
+  return useContext(UserContext)
+}
+ 
+// Now, this needs to be added as parent component as data provider like...
+function App(){
+
+  /*
+    Here we need to pass values to context which React can then share with us using useContext.
+    React just helps to store and access context data. its up us how we are storing data like using state or creating Fn
+    We need to link those variables in `values` attribute of UserContextProvider which provides context to our UserContext
+    This is like setting values to out Context.
+  */
+
+  return (
+     <UserContextProvider value={{userName, isLoggedIn}}>
+        <p>I am paragraph</p>
+     </UserContextProvider>
+  );
+}
+
 ```
+
+#### Other solutions
+- Redux, Redux-toolkit (easier version of redux)
 
 ### useReducer
 - When state is having frequent updated in that case reducer can be used to enhance performance
@@ -348,6 +385,71 @@ loader in router gives flexibility to call API which is required to populate com
 /* and then use useLoaderData to fetch this data in component*/
 const data = useLoaderData()
 
+```
+
+# Redux | Redux toolkit
+- Documentation: https://redux-toolkit.js.org/introduction/getting-started
+- Like `react-dom` uses `react` just like that `react-redux` uses `redux` as an internal lib.
+> Redux toolkit is enhanced version of Redux which provides more abstractions and out of the box middleware support which we need to add manually in redux.
+-  `Store`: single source of truth like global variable
+- `Reducer`: Any change in `store` will be done by Reducer. For understanding this can be considered as Dao layer
+- `useSelector`: selects value from store
+- `useDispatch`: sends value to store
+- `slice`: bigger version of reducer
+
+Installation
+```bash
+npm install @reduxjs/toolkit
+npm install react-redux
+```
+
+Setup
+```js
+// creating slice
+const profileSlice = createSlice({
+  name: 'slice-name',
+  initialState, // Default values of state
+  reducers: {
+    addProfile : (state, action) => {
+      const profile = {
+        id: nanoid(),
+        text: action.payload
+      }
+      state.profiles.add(profile);
+    },
+    removeProfile: (state, action)=>{},
+    updateProfile: (state, action)=>{}
+  }
+})
+
+export default profileSlice.reducer
+
+// configure store. store needs to know about reducers
+export const store = configureStore({
+  reducer: profileReducer
+})
+
+```
+
+##### How to create store ?
+```js
+import {configureStore} from '@reduxjs/toolkit'
+const store = configureStore({});
+
+// Dispatch uses reducer ans updates values in store
+const dispatch = React.useDispatch()
+const someHandler = () => {
+  // Call reducer from here...
+  dispatch(addProfile(someInput));
+}
+
+// Retrieve store data for usage
+const profiles = useSelector(state => state.profiles)
+
+// Now we need to wrap our component with Provider in index.js
+<Provider store={store}>
+  <App />
+</Provider>
 ```
 
 # Thinking in React
