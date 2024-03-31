@@ -6,6 +6,21 @@
 
 ## ACID
 
+### Availability
+
+### Consistency
+Represents if data is up to date in DB. i.e, If read is reflecting latest write in DB ?
+
+- Linearizable consistency: Any read will give most uptodate data
+    - Can have Low latency
+    - Might not be highly available
+- Evantual consistency: Read can have upto date data after some delay
+- Casual consistency: 
+
+### Integrity
+
+### Durability
+
 ## Sharding and Partitioning
 > Shard the database, partition the data.
 
