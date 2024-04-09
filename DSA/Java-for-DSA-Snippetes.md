@@ -25,6 +25,7 @@ s="abcd"; // assing string
 s.charAt(i); // get ith character from string
 for(char c: a){} // iterate over string
 s.substr(startIndex,len); // find substring from startIndex having length=len
+for (char c : s.toCharArray()) {}
 ```
 ## Matric
 
@@ -35,6 +36,13 @@ int dp[][] = new int[m][n];
 ## Sort in Java
 
 ## Stack in Java
+
+```java
+Stack<E> stack = new Stack<E>();
+stack.push(12);
+Integer topElement =  stack.pop();
+Integer element = (Integer) stack.peek(); // It does not delete element
+```
 
 ## Queue in Java
 

@@ -93,47 +93,49 @@ Relationship among data preference…
 1:many -> Document DB
 Many:1 -> Relational
 Many:Many -> ( Relational <<< Graph Model) is more useful here.
-ACID properties
-Atomicity : Either txn happenes or do not happen, there is no intermediate state
-Consistency
-Isolation: Multiple txn occurs independently without interference
-Durability
-PACELC theorem
-PACELC theorem is an extension to the CAP theorem. It states that in case of network partitioning (P) in a distributed computer system, one has to choose between availability (A) and consistency (C) (as per the CAP theorem), but else (E), even when the system is running normally in the absence of partitions, one has to choose between latency (L) and consistency (C).
-When writing db query…
-Always validate query params
-Carefully check edge case if query can scan millions of rows due to bad output.
-Always put limit in query if possible
-NoSQL follows BASE consistency model..
-BA: Basic availability
-Soft state
-Eventual consistency
-When DB performance needs to improve quickly….
-Can do vertical scaling for a time being
-Use connection pool in DB query….
-Effectively establishes connection and reuses it
-To avoid so many connections on DB…you can use Connection Proxy like RDS.
-Build Microservices with loose coupling and high cohesion
-Loose coupling: Min dependency b/w services. I.e, expose min things to others. And changes in 1 service do not lead to change in other services. Loose coupling advocates for the separation of unrelated components.
-High Cohesion: Keep similar functionalities together in 1 microservice. grouping together of related components.
-GraphQL:
-Query language for APIs
-API aggregator…unified common apis exposed to clients.
-GraphQL queries access not just the properties of one resource but also smoothly follow references between them. While typical REST APIs require loading from multiple URLs, GraphQL APIs get all the data your app needs in a single request. Apps using GraphQL can be quick even on slow mobile network connections.
-TypeScript:
-JS with syntax with types
-Dependency Injection
-Dependency injection is a software design pattern in which one or more dependencies (or services) are injected, or passed by reference, into a dependent object.
-Useful for testing and mocking module responses.
-WebRTC vs websockets
-Websockets:
-For bidirectional communication
-Used TCP
-Good for signaling
-WebRTC: 
-Unidirectional 
-Used UDP
-Developed by google, good for audio/video streaming
+
+- ACID properties
+  - Atomicity : Either txn happenes or do not happen, there is no intermediate state
+  - Consistency
+  - Isolation: Multiple txn occurs independently without interference
+  - Durability
+- PACELC theorem
+  - PACELC theorem is an extension to the CAP theorem. It states that in case of network partitioning (P) in a distributed computer system, one has to choose between availability (A) and consistency (C) (as per the CAP theorem), but else (E), even when the system is running normally in the absence of partitions, one has to choose between latency (L) and consistency (C).
+- When writing db query…
+  - Always validate query params
+  - Carefully check edge case if query can scan millions of rows due to bad output.
+  - Always put limit in query if possible
+- NoSQL follows BASE consistency model..
+  - BA: Basic availability
+  - Soft state
+  - Eventual consistency
+- When DB performance needs to improve quickly….
+  - Can do vertical scaling for a time being
+  - Use connection pool in DB query….
+  - Effectively establishes connection and reuses it
+  - To avoid so many connections on DB…you can use Connection Proxy like RDS.
+- Build Microservices with loose coupling and high cohesion
+  - Loose coupling: Min dependency b/w services. I.e, expose min things to others. And changes in 1 service do not lead to change in other services. Loose coupling advocates for the separation of unrelated components.
+  - High Cohesion: Keep similar functionalities together in 1 microservice. grouping together of related components.
+- GraphQL:
+  - Query language for APIs
+  - API aggregator…unified common apis exposed to clients.
+  - GraphQL queries access not just the properties of one resource but also smoothly follow references between them. While typical REST APIs require loading from multiple URLs, GraphQL APIs get all the data your app needs in a single request. Apps using GraphQL can be quick even on slow mobile network connections.
+- TypeScript:
+  - JS with syntax with types
+- Dependency Injection
+  - Dependency injection is a software design pattern in which one or more dependencies (or services) are injected, or passed by reference, into a dependent object.
+  - Useful for testing and mocking module responses.
+- WebRTC vs websockets
+  - Websockets:
+    - For bidirectional communication
+    - Uses TCP
+    - Good for signaling
+  - WebRTC: 
+    - Unidirectional 
+    - Uses UDP
+    - Developed by google, good for audio/video streaming
+
 Prometheus and Grafana
 Prometheus query language which collects data and gives queried results.
 Used LevelDB for indexes
@@ -170,17 +172,25 @@ Dead letter queue
 A separate queue from the main/live queue where we can store messages after N retries which cant be processed but may require engineering input to check the problem.
 High load on DB : In some cases where write on DB is high on specific times and if we can wait for some time to reflect data in DB then asynchronous write can be one option where all DB writes will go via queue.
 Serverless Architecture: If processing is based on some events and load is not continuous and is very less then lambda like service can be used which is serverless. It’s highly cost effective.
-DynamoDB
-NoSQL key value store fully managed by amazon with a very low latency
-When you want to ensure data consistency between 2 tables. One approach is 2 way handshake
-You send data to other service
-Other services acks back and update current service’s data
+- DynamoDB
+  - NoSQL key value store fully managed by amazon with a very low latency
+- When you want to ensure data consistency between 2 tables. One approach is 2 way handshake
+  - You send data to other service
+  - Other services acks back and update current service’s data
 
-References
-https://github.com/donnemartin/system-design-primer
-DDIA notes: https://docs.google.com/document/d/1Yn6ee7WEK6r6q49mVX7uqbEtoYc9zizaQeIQy_c9Oh8/edit
-https://drive.google.com/file/d/16wtG6ZsThlu_YkloeyX8pp2OEjVebure/view
-https://www.youtube.com/c/HusseinNasser-software-engineering/videos
-[Mark and Sweep Garbage Collection Algorithm] https://www.youtube.com/watch?v=4qLf0FJMyf0
+- Consistency Models
+  - Serialised / Linearised : Ordering imposed
+  - Eventual consistency : Eventually all nodes gets synced. Not all read gived most recent writes
+  - Casual consistency: Groups relavant operations and executes in order.
+  - Quorum: configurable consistency when having multiple nodes
+    - R + W > N --> To ensure strong consistency
+    - R + W <= N --> Eventual consistency
+
+# References
+- https://github.com/donnemartin/system-design-primer
+- DDIA notes: https://docs.google.com/document/d/1Yn6ee7WEK6r6q49mVX7uqbEtoYc9zizaQeIQy_c9Oh8/edit
+- https://drive.google.com/file/d/16wtG6ZsThlu_YkloeyX8pp2OEjVebure/view
+- https://www.youtube.com/c/HusseinNasser-software-engineering/videos
+- [Mark and Sweep Garbage Collection Algorithm] https://www.youtube.com/watch?v=4qLf0FJMyf0
 
 
