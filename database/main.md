@@ -1,5 +1,23 @@
 # Databases
 
+## 3 Types of Data Models
+| Relational Model                                                                   | Document Model                                                                             | Graph Model                                                          |
+|------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| Considerable support for Many:Many relationships                                   | Not ideal for Many:Many relationships                                                      | Ideal for Considerable support for Many:Many relationships           |
+| For 1:Many relationship this can be overhead if for each query joins are required. | Idea for 1:Many relation if while document is required for each query                      | Not ideal for 1:Many relationship                                    |
+| Generally used for business data processing / transactional processing             | Generally used for dynamic and expressive data models. Schema can be evolved over the time | Very flexible if different kinf of relationshios keeps getting added |
+
+## SQL and NoSQL
+| Parameter            | SQL                                                                                           | NoSQL                                                                                                           |
+|----------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| Schema Flexibility   | Schema is predefined. Schema update requires manual table update                              | Great schema flexibility. No need to define schema. Schema update is easy.                                      |
+| Scalability          | Scalability not easy as NoSQL varients                                                        | In built scalability support                                                                                    |
+| Fault tolerance      | Mostly follows Master slave architecture. If master fails slave becomes master.               | All nodes are equal. Might have leader.Data replicated amongs other nodes as well.                              |
+| Transactions support | In-built ACID support. Preferred choice for financial data and where concurrency is criticall | No In-built transactions support.                                                                               |
+| Consistency          | Highly consistent                                                                             | Consistency is configured as per Quorum. Mostly eventual consistent                                             |
+| Data Model           | Not an ideal choice where single Data model needs multiple queries or Joins                   | Ideal choice where complete document is needed for any query as whole document is stores as a continuous block. |
+| Join Support         | Most of the implementation will have Join support                                             | Not much Join support                                                                                           |
+
 ## Types
 1. CPU bound database: Where all indexes are fit in RAM and only limitation will be CPU
 2. I/O bound database: Where indexes does not fit in RAM and goes to disk to acoomodate others. I/O is bottleneck here.

@@ -1,20 +1,20 @@
-Overview
+# Short Notes
 
-Fear of data loss from RAM, hard disk or machine failure. 
-Do Replication.
-Replication involves a leader and replicas approach.
-If too much data..
-Do sharding (split data on diff machines)
-Fear of overloading on one machine.
-Do horizontal scaling with load balancing techniques like consistent hashing, proxy, load balancer
-If the middleware component becomes a bottleneck in data handling for proxy..
-Get IP address from zookeeper kind of infra and then directly connect to machine for communication
-Synchronous vs asynchronous replicas
-Synchronous: choose this if it requires strong guarantee of data persistence.
-Data gets written to replica and after write is done producer receives ack.
-Strong consistency in case read is done from replica
-Asynchronous: little low guarantee of data persistence.
-Has higher throughput than synchronous replication.
+- Fear of data loss from RAM, hard disk or machine failure. 
+  - Do Replication
+  - Replication involves a leader and replicas approach.
+- If too much data..
+  - Do sharding (split data on diff machines)
+- Fear of overloading on one machine.
+  - Do horizontal scaling with load balancing techniques like consistent hashing, proxy, load balancer
+- If the middleware component becomes a bottleneck in data handling for proxy..
+  - Get IP address from zookeeper kind of infra and then directly connect to machine for communication
+- Synchronous vs asynchronous replicas
+  - Synchronous: choose this if it requires strong guarantee of data persistence.
+      - Data gets written to replica and after write is done producer receives ack.
+      - Strong consistency in case read is done from replica
+  - Asynchronous: little low guarantee of data persistence.
+      - Has higher throughput than synchronous replication.
 Eventual consistency if read is done from replica.
 We can configure X no of sync replicas and Y no of async replicas. Total replica = X + Y
 If application is read heavy and calculated data is not changed too frequently..
@@ -186,11 +186,28 @@ Serverless Architecture: If processing is based on some events and load is not c
     - R + W > N --> To ensure strong consistency
     - R + W <= N --> Eventual consistency
 
+# Authentication (TBA)
+- How api requests will be authenticated
+- How Authorisation will work ?
+
+# Service Discovery
+
+- https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/
+- https://www.redhat.com/en/topics/integration/what-is-a-service-registry
+
+# Consistent Hashing
+- Partitioning is used to distribute data across nodes. But how do we handle node addition/removal with maintaining uniform data distribution  : **Consistent Hashing** comes to the rescue
+- Each node is assigned a range and Hash(key) = value --> is then mapped to the range which selects node.
+- If any node is deleted then next node's range increases and data moves there which creates ununiform data distribution.
+- To solve this, Consistent Hashing used virtual nodes to maintain uniform data.
+- DynamoDB and Cassandra uses Consistent Hashing 
+- References:
+  - https://www.youtube.com/watch?v=UF9Iqmg94tk
+
 # References
 - https://github.com/donnemartin/system-design-primer
 - DDIA notes: https://docs.google.com/document/d/1Yn6ee7WEK6r6q49mVX7uqbEtoYc9zizaQeIQy_c9Oh8/edit
 - https://drive.google.com/file/d/16wtG6ZsThlu_YkloeyX8pp2OEjVebure/view
 - https://www.youtube.com/c/HusseinNasser-software-engineering/videos
 - [Mark and Sweep Garbage Collection Algorithm] https://www.youtube.com/watch?v=4qLf0FJMyf0
-
-
+- https://systemdesign.one/
