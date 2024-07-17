@@ -64,7 +64,8 @@ https://en.wikipedia.org/wiki/Single-responsibility_principle
 ## Dependency inversion principle
 - **Woks for Composition**
 - Components should be dependent on abstraction(Interfaces) rather than concrete classes. i.e, Class should not load concrete class and then call its method. Rather it should have variable like IHasher which is interface/abstract class and then call IHasher.hashPw() so that - IHasher can have multiple hashing algorithms and adding/ deleting algorithm do not require our class to change implementations
-One of the way to achieve this is Factory pattern
+- One of the way to achieve this is Factory pattern
+- DI is the method of implementing O in SOLID principle
 
 # Design Patterns In Depth
 
@@ -436,6 +437,11 @@ Think about concurrency in LLD interview
     - One of the problem with Inheritance is that class needs to be inherited. Which is not possible in all the cases.
 5. Strive for loosely coupled designs between objects that interact.
     - Observer is such pattern
+
+# LLD Interview
+
+- Prefer to draw class diagram and connections. It helps conceptualise the design and ease out coding part
+- 
 
 # References
 - LLD primer: https://github.com/prasadgujar/low-level-design-primer/blob/master/solutions.md

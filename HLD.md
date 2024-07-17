@@ -168,8 +168,8 @@ Simple to implement, low latency and api calls on client side, hides implementat
 Problem with availability, data consistency and distributed transactions.
 Problem if one of the service goes down
 Tools: KrakenD, Kong, Managed API gw services
-Dead letter queue
-A separate queue from the main/live queue where we can store messages after N retries which cant be processed but may require engineering input to check the problem.
+- Dead letter queue
+  - A separate queue from the main/live queue where we can store messages after N retries which cant be processed but may require engineering input to check the problem.
 High load on DB : In some cases where write on DB is high on specific times and if we can wait for some time to reflect data in DB then asynchronous write can be one option where all DB writes will go via queue.
 Serverless Architecture: If processing is based on some events and load is not continuous and is very less then lambda like service can be used which is serverless. It’s highly cost effective.
 - DynamoDB
@@ -177,7 +177,6 @@ Serverless Architecture: If processing is based on some events and load is not c
 - When you want to ensure data consistency between 2 tables. One approach is 2 way handshake
   - You send data to other service
   - Other services acks back and update current service’s data
-
 - Consistency Models
   - Serialised / Linearised : Ordering imposed
   - Eventual consistency : Eventually all nodes gets synced. Not all read gived most recent writes
@@ -185,6 +184,10 @@ Serverless Architecture: If processing is based on some events and load is not c
   - Quorum: configurable consistency when having multiple nodes
     - R + W > N --> To ensure strong consistency
     - R + W <= N --> Eventual consistency
+
+# Vertical vs Horizontal Scaling
+- Vertical: Buying bigger machines
+- Horizontal: Buying more machines
 
 # Authentication (TBA)
 - How api requests will be authenticated
@@ -200,9 +203,42 @@ Serverless Architecture: If processing is based on some events and load is not c
 - Each node is assigned a range and Hash(key) = value --> is then mapped to the range which selects node.
 - If any node is deleted then next node's range increases and data moves there which creates ununiform data distribution.
 - To solve this, Consistent Hashing used virtual nodes to maintain uniform data.
-- DynamoDB and Cassandra uses Consistent Hashing 
+- DynamoDB,Memcached and Cassandra uses Consistent Hashing 
 - References:
   - https://www.youtube.com/watch?v=UF9Iqmg94tk
+
+# Load Balancing vs Reverse Proxy vs API Gateway
+
+- **Load Balancing** 
+  - Process of distributing network traffic across a group of backend servers is known as Load Balancing
+  - Acts as reverse proxy by routing requests to different backend servers
+  - Does the job of request routing as per configured algorithm in LB
+  - Can keep an eye on server healths and adds / removes servers as per load criteria
+  - Types of Load Balancers:
+    - Network Load Balancer
+      - Functions at Layer 4 specifically handling TCP traffics, distributing traffic at transport layer
+      - Makes routing decisions using IP address and destination port
+    - Application Load Balancer
+      - Operates at Layer 7 of OSI model - at Application level traffic routing
+      - Enhances security & simplifies the application by always ensuring the use of the latest SSL/TLS ciphers and protocols.
+  - LB algorithms
+    - Round Robin: sequencially 1 by 1 to diff servers
+    - Sticky round robin: subsequent requests from a client go to the same service instance that handled the initial request.
+    - Weighted round-robin: The administrator can assign weights to each service, determining the proportion of requests each service handles.
+    - Hash : This algorithm applies a hash function to the IP or URL of incoming requests. The instances to which requests are routed depend on the hash function’s result.
+    - Least connections : new requests are directed to the service instance with the fewest concurrent connections.
+    - Least response time : new requests are sent to the service instance with the quickest response time.
+- **Reverse Proxy**
+  - acts as a mediator between client and server
+  - A reverse proxy sits in front of an origin server and ensures that no client ever communicates directly with that origin server
+  - Benifits
+    - It can do load balancing
+    - It can cache the response
+- **API Gateway**
+  - Extension of reverse proxy
+
+
+
 
 # References
 - https://github.com/donnemartin/system-design-primer

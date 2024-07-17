@@ -91,7 +91,7 @@ Master serves write requests and critical read requests while there are other re
 
 Transaction: When sequence of queries are grouped as one.
 
-Isolation: How 2 parallel transaction can affect each other. 2 Transactions are isolated is queries in one transaction do not affect queries in other transaction.
+Isolation: How 2 parallel transaction can affect each other. 2 Transactions are isolated if queries in one transaction do not affect queries in other transaction.
 
 ### Read Uncommitted
 - With this isolation level read queries may get dirty reads as well.
@@ -114,6 +114,9 @@ Isolation: How 2 parallel transaction can affect each other. 2 Transactions are 
 - All transactions are executed in serialized or such that no 2 transactions affect each other
 - This avoids Phantom reads. Phantom reads mean - when one read in transaction gets reasult X and same read query in transaction gets result Y. Here X != Y so some phantom/ghost value is added/removed.
 - Highest level of Isolation
+
+## Data Storage & Retrievals (DDIA Notes)
+
 
 ## Databases
 

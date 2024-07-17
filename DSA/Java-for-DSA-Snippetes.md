@@ -94,6 +94,32 @@ Integer topElement =  stack.pop();
 Integer element = (Integer) stack.peek(); // It does not delete element
 ```
 
+### Monotonic stack 
+
+- Monitonic stack presers array element sequence either in asc or desc order.
+- Many questions can be solved using monotonic stack 
+
+```java
+class Solution {
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        Stack<Integer> st = new Stack<>();
+        int len = nums2.length;
+        int[] mp = new int[10001]; 
+        Arrays.fill(mp,-1);
+        for(int i=len-1;i>=0;i--){
+            int nextGreater = -1;
+            while(!st.empty() && st.peek() < nums2[i]) {
+                st.pop();
+            }
+            if(!st.empty())  { 
+                System.out.println(st.peek());
+            };
+            st.push(nums2[i]);
+        }
+    }
+}
+```
+
 ## Queue in Java
 
 ```java
@@ -122,6 +148,17 @@ PriorityQueue<Node> pq = new PriorityQueue<>((left,right)-> left.f-right.f);
 // Thread safe priority queue
 Queue<Integer> threadSafeQueque= new PriorityBlockingQueue<Integer>();
 
+/// Double ended queue / Deque
+Deque<Integer> deq = new LinkedList<>(); // new ArrayDeque<>();
+deq.addFirst(1);
+deq.addLast(2); // OR deq.tail();
+deq.removeFirst();
+deq.removeLast();
+deq.peekFirst();
+deq.peekLast();
+deq.size();
+
+
 ```
 
 ## DFS
@@ -142,6 +179,98 @@ void dfs(int i, int j, char[][] grid,boolean visited[][]){
 ## Heap in Java
 
 ## Trie in Java
+
+```java
+class Trie {
+
+    class TrieNode {
+        public boolean ends = false;
+        // mp to store 'a' -> TrieNode mapping... 
+        public Map<Character, TrieNode> mp = new HashMap<>();
+    }
+
+    TrieNode root;
+
+    public Trie() {
+        root = new TrieNode();
+    }
+    
+    public void insert(String word) {
+        TrieNode curr = root;
+        for(char c: word.toCharArray()){
+            if(!curr.mp.containsKey(c)) {
+                curr.mp.put(c, new TrieNode());
+            }
+            curr = curr.mp.get(c);
+        }
+        curr.ends = true;
+    }
+    
+    public boolean search(String word) {
+        TrieNode curr = root;
+        for(char c: word.toCharArray()){
+            if(curr.mp.containsKey(c)) {
+                curr = curr.mp.get(c);
+            } else {
+                return false;
+            }
+        }
+        return curr.ends;
+    }
+    
+    public boolean startsWith(String prefix) {
+        TrieNode curr = root;
+        for(Character c: prefix.toCharArray()){
+            if(curr.mp.containsKey(c)) {
+                curr = curr.mp.get(c);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+## 0/1 Knapsack Problem
+
+In this problem there will be N items with its characteristics like Weight, Value and we will be given some constraint like Max weight carrying capacity. We will need to maximize the amount of values.
+
+- The possible solution will be to check both options, pick the element or do not pick which can be done using recursive approach which checks all possible combinations.
+- Recursive approach generated too many branches but Memoization can cut down on number of branches when stored repeated results.
+
+```java
+public class Solution{
+
+    public static int dfs(int[] weight, int[] value, int n, int currIndex , int remWeight, int dp[][]){
+        int ans=0;
+
+        if(currIndex < n && dp[currIndex][remWeight]!=-1) {
+            return dp[currIndex][remWeight];
+        } 
+        if(n - 1 == currIndex) {
+            if(remWeight >= weight[currIndex]) {
+                ans=value[currIndex];
+            }
+        } else {
+            ans=dfs(weight, value, n , currIndex + 1 , remWeight , dp);
+            if(remWeight - weight[currIndex] >=0){
+                ans= Math.max(ans, value[currIndex] + dfs(weight, value, n , currIndex + 1 , remWeight - weight[currIndex], dp));
+            }
+        }
+        dp[currIndex][remWeight] = ans;
+        return ans;
+    }
+
+    static int knapsack(int[] weight, int[] value, int n, int maxWeight) {
+        int dp[][] = new int[n+1][maxWeight+1];
+        for(int i=0;i<=n;i++)
+            Arrays.fill(dp[i], -1);
+
+        return dfs(weight, value, n, 0 ,maxWeight, dp);
+    }
+}
+```
 
 ## Graph
 - https://amortizedminds.wordpress.com/2015/06/30/djakstras-shortest-path-algorithm/
@@ -193,59 +322,6 @@ void dfs(int i, int j, char[][] grid,boolean visited[][]){
 
 ```java
 
-```
-
-## Tree
-
-### Iterative traversal
-
-```java
-function Inorder(head)
-   if head==NULL 
-        return
-   stack s
-   while(1)
-        if head!=NULL
-             s.push(head)
-             head=head->left
-       else
-            if s.empty()
-                break
-            head=s.top()
-            print head->data
-            head=head->right
-
-function Preorder(head)
-    if head==NULL
-        return
-    stack s
-    s.push(head)
-    while(!s.empty())
-         head=s.top()
-         s.pop()
-         print head->data
-         if head->right!=NULL
-              s.push(head->right)
-         if head->left !=NULL
-              s.push(head->left) 
-
-function postOrder(head)
-     if head==NULL
-          return
-     stack s1,s2
-     s1.push(head)
-     while(!s1.empty())
-         root=s1.top()
-         s1.pop()
-         s2.push(root)
-         if root->left!=NULL
-            s1.push(head->left)
-         if root->right!=NULL
-            s1.push(head->right)
-    while(!s2.empty())
-       root=s2.top()
-       print root->data
-       s2.pop()
 ```
 
 ## Disjoint Set Union
