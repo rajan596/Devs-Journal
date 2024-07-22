@@ -16,7 +16,7 @@
         6. Flyweight
         7. Proxy
     * Behavioral Patterns : How more than one objects communicate with each other
-        1. Chain of Responsibility
+        1. **Chain of Responsibility**
         2. Command
         3. Iterator
         4. Interpreter
@@ -139,6 +139,22 @@ Useful to wrap out main method from client and put explicit sanity checks/ valid
 
 ## Behavioral patterns
 These patterns are concerned with algorithms and the assignment of responsibilities between objects.
+
+### Chain of Responsibility
+
+- the chain of responsibility pattern creates a chain of receiver objects for a request.
+- One such example is Http request handling by Servlet Filters
+- In this design each Handler checks if it needs to process Else it will pass it to next Handler
+- Here each Handler should have reference to next handler.
+- This is mainly useful when requestor is unaware of which kind of Handler to use i.e, Log level Info,Errot,Critical which can be given at run time.
+
+Points
+- <Advantage> Decoupling between request and response processing
+- <DisAdvantage> Creates nesting which may result in a ling stack trace
+
+![alt text](./assets/images/chain_of_responsibility.png)
+
+References: https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
 
 ### Strategy Pattern
 Deciding behavior class based on strategy.
