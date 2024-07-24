@@ -134,6 +134,19 @@ Clients need not worry when references object using interface/abstract class whi
 ## Structural Patterns
 These patterns explain how to assemble objects and classes into larger structures while keeping these structures flexible and efficient.
 
+### Adapter
+
+### Bridge
+
+### Composite
+- ** Object Inside Object **
+- Like File System, Employee Hierarchy or Tree Like structure Composite pattern can be used.
+- Problem: 
+
+```java
+
+```
+
 ### Proxy pattern:
 Useful to wrap out main method from client and put explicit sanity checks/ validations
 
@@ -141,6 +154,8 @@ Useful to wrap out main method from client and put explicit sanity checks/ valid
 These patterns are concerned with algorithms and the assignment of responsibilities between objects.
 
 ### Chain of Responsibility
+
+![Alt Text](./assets/images/chain_of_responsibility.png)
 
 - the chain of responsibility pattern creates a chain of receiver objects for a request.
 - One such example is Http request handling by Servlet Filters
@@ -152,9 +167,11 @@ Points
 - <Advantage> Decoupling between request and response processing
 - <DisAdvantage> Creates nesting which may result in a ling stack trace
 
-![alt text](./assets/images/chain_of_responsibility.png)
 
-References: https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
+
+References: 
+    - https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
+    - https://refactoring.guru/design-patterns/chain-of-responsibility
 
 ### Strategy Pattern
 Deciding behavior class based on strategy.
@@ -383,9 +400,21 @@ void addNewTopping(IPizza pizza, Topping topping){
 TODO
 
 ## State Design Pattern
-Can use this when your system have multiple states and multiple events on same state
-Can create interface of State with possible functionalities/event at each state
+- Can use this when your system have multiple states and multiple events on same state
+- Can create interface of State with possible functionalities/event at each state
 Avoids multiple if-else conditions
+- State Interface will note down all possible operations
+- Concerete State classes Like State1, State2 will implement State Intrface and implement Only relevant Operations like Op1, Op2 and for non relevant operation either throw exception or do default implementation.
+
+![State Design Pattern Image](./assets/images/state_design_pattern.png)
+
+Examples: 
+    - Vending Machine
+    - ATM 
+
+References
+    - https://refactoring.guru/design-patterns/state
+    - 
 
 # Important LLD concepts
 
