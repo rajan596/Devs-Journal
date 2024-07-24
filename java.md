@@ -178,7 +178,33 @@ int result = a >>> 2;  // Result: 00111111 11111111 11111111 11111110 (which is 
 // Use >> when you need to preserve the sign of the number during the shift.
 // Use >>> when you do not want to preserve the sign and want to fill the higher-order bits with 0s.
 ```
-
+- Overriden method Scope change ?
+    - Overriden method can have Wider or equal scope but not limited scope.
+    - If Parent method is Protected then Child can have Protected or Default but not provate Scope
+- ArrayList Internal Implementation
+    - Due to ArrayLists array-based nature, it grows dynamically in size ensuring that there is always enough room for elements. When an ArrayList element is first created, the default capacity is around 10-16 elements which basically depends on the Java version. ArrayList elements are copied over from the original array to the new array when the capacity of the original array is full. As the ArrayList size increases dynamically, the class creates a new array of bigger sizes and it copies all the elements from the old array to the new array. Now, the reference of the new array is used internally. This process of dynamically growing an array is known as resizing. 
+- Set Implmentations in Java
+    - HashSet : Maintains unique elements using Hash table, No insertion order is maintained
+        - O(1) add/remove/contains
+    - LinkedHashSet : Maintains unique elements along with insersion order.
+        - It is very helpful when iteration order is needed. During Iteration in LinkedHashSet, elements are returned in the same order they are inserted.
+    - TreeSet : Maintains custom insertion order or as per Default order
+- Map Implementations in Java
+    - SortedMap
+    - TreeMap
+        - Impmented using Red-black Tree
+        - Cant have NULL as Key
+        - Non synchronized
+        - ASC order
+    - HashMap
+    - LinkedHashMap
+- Queue Implementations in Java
+    - BlockingQueue : A blocking queue is a Queue that supports the operations that wait for the queue to become non-empty while retrieving and removing the element, and wait for space to become available in the queue while adding the element.
+    - 
+- Random number generation
+```java
+int no = new Random().nextInt(1000); // Between [0,999] including 0 and 999
+```
 - Generics:
     - Implementation of class irrespective of data type like….Stack of various data types.
     - The generic information is lost in runtime. There is no runtime equivalent of a Creator<String>.class. You could create a type between Creator and StringCreator which fixes the generic type
