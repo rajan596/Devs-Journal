@@ -15,63 +15,65 @@
       - Strong consistency in case read is done from replica
   - Asynchronous: little low guarantee of data persistence.
       - Has higher throughput than synchronous replication.
-Eventual consistency if read is done from replica.
-We can configure X no of sync replicas and Y no of async replicas. Total replica = X + Y
-If application is read heavy and calculated data is not changed too frequently..
-Think if you can use a cache here
-Write heavy application….
-Think if you can use a message queue if data is not required to be updated immediately
-Requires searching ?
-Think of creating indexes for DB
-For text based search like auto complete/suggestions think of ES/Solr
-DB choices…
-If ACID required..go for RDBMS
-If ACID not require….can think for NoSQL…even if data is unstructured then good probability to use this schema
-Ever increasing data + finite query => columnar DB - cassandra, HBase
-User info, catalog type data -> Document DB : Mongo, couchbase
-Think about query patterns ??
-If query only on key -> use Key-store DB like DynamoDB
-Query on multiple fields..can go with Relational or DocumentDB
-Fuzzy search -> ES
-Strong consistency -> go for relational
-More focus on availability -> can go for NoSQL
-Proxies
-Forward proxy = VPN
-Reverse proxy = server side proxy = load balancing
-CAP theorem: Any n/w shared system can not have all 3 properties. Need to sacrifice one of them
-MongoDB: CP system
-Cassandra: AP system
-Want to reduce API latency
-Think of caching….redis, memcached -- non relational DB
-Storing images, videos
-Think of amazon s3 as blob storage,
-Think of CDN for faster delivery
-  Non Relational DB
-Built for scale
-Built for aggregation
-Horizontal partitioning inbuilt
-Document DB:
-Not sure about schema, schema evolve over time
-Supports heavy read, writes
-No ACID properties and joins tough to achieve
-Use case: Product details of amazon
-Columnar DB:
-Use case: streaming data, event logging for analytics
-Multi tenant architecture
-Each customer have their own infra isolated
-Finding nearby locations/restaurants using lat and long
-Elastic search
-MongoDB
-Cache data volatility
-While Redis is an in-memory (mostly) data store and it is not volatile, Memcached is an in-memory cache and it is volatile.
-Redis has the option to backup data using…
-RDB snapshot: snapshot of DB at every n minutes
-Append only File. AOF. which writes every txn in file
-Want to have caching which supports data types ?
-Consider Redis
-It supports multiple data types
-Redis as PubSub
-You can configure the channel and subscribers can subscribe to it.
+- Eventual consistency if read is done from replica.
+- We can configure X no of sync replicas and Y no of async replicas. Total replica = X + Y
+- If application is read heavy and calculated data is not changed too frequently..
+- Think if you can use a cache here
+- Write heavy application….
+  - Think if you can use a message queue if data is not required to be updated immediately
+- Requires searching ?
+  - Think of creating indexes for DB
+- For text based search like auto complete/suggestions think of ES/Solr
+- DB choices…
+  - If ACID required..go for RDBMS
+  - If ACID not require….can think for NoSQL…even if data is unstructured then good probability to use this schema
+  - Ever increasing data + finite query => columnar DB - cassandra, HBase
+  - User info, catalog type data -> Document DB : Mongo, couchbase
+  -Think about query patterns ??
+    - If query only on key -> use Key-store DB like DynamoDB
+    - Query on multiple fields..can go with Relational or DocumentDB
+    - Fuzzy search -> ES
+  - Strong consistency -> go for relational
+  - More focus on availability -> can go for NoSQL
+- Proxies
+  - Forward proxy = VPN
+  - Reverse proxy = server side proxy = load balancing
+- CAP theorem: Any n/w shared system can not have all 3 properties. Need to sacrifice one of them
+  - MongoDB: CP system
+  -Cassandra: AP system
+- Want to reduce API latency
+  - Think of caching….redis, memcached -- non relational DB
+- Storing images, videos
+  - Think of amazon s3 as blob storage,
+- Think of CDN for faster delivery
+- Non Relational DB
+  - Built for scale
+  - Built for aggregation
+  - Horizontal partitioning inbuilt
+- Document DB:
+  - Not sure about schema, schema evolve over time
+  - Supports heavy read, writes
+  - No ACID properties and joins tough to achieve
+  - Use case: Product details of amazon
+- Columnar DB:
+  - Use case: streaming data, event logging for analytics
+  - Multi tenant architecture
+  - Each customer have their own infra isolated
+  - Finding nearby locations/restaurants using lat and long
+- Elastic search
+- MongoDB
+- Cache data volatility
+
+# Redis
+- Redis
+- While Redis is an in-memory (mostly) data store and it is not volatile, Memcached is an in-memory cache and it is volatile.
+- Redis has the option to backup data using…
+  - RDB snapshot: snapshot of DB at every n minutes
+  - Append only File. AOF. which writes every txn in file
+  - Want to have caching which supports data types ?
+    - Consider Redis. It supports multiple data types
+- Redis as PubSub
+- You can configure the channel and subscribers can subscribe to it.
 Thinking about idempotency…
 means..Multiple req has same result. 
 Like, user can like post only once even after multiple api hits.
@@ -132,7 +134,8 @@ Many:Many -> ( Relational <<< Graph Model) is more useful here.
     - Uses TCP
     - Good for signaling
   - WebRTC: 
-    - Unidirectional 
+    - Unidirectional
+    - Peer 2 Peer : Anyone can talk to anyone
     - Uses UDP
     - Developed by google, good for audio/video streaming
 
