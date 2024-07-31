@@ -38,9 +38,6 @@
 - Proxies
   - Forward proxy = VPN
   - Reverse proxy = server side proxy = load balancing
-- CAP theorem: Any n/w shared system can not have all 3 properties. Need to sacrifice one of them
-  - MongoDB: CP system
-  -Cassandra: AP system
 - Want to reduce API latency
   - Think of caching….redis, memcached -- non relational DB
 - Storing images, videos
@@ -63,46 +60,40 @@
 - Elastic search
 - MongoDB
 - Cache data volatility
-
-# Redis
 - Redis
-- While Redis is an in-memory (mostly) data store and it is not volatile, Memcached is an in-memory cache and it is volatile.
-- Redis has the option to backup data using…
-  - RDB snapshot: snapshot of DB at every n minutes
-  - Append only File. AOF. which writes every txn in file
-  - Want to have caching which supports data types ?
-    - Consider Redis. It supports multiple data types
-- Redis as PubSub
+  - While Redis is an in-memory (mostly) data store and it is not volatile, Memcached is an in-memory cache and it is volatile.
+  - Redis has the option to backup data using…
+    - RDB snapshot: snapshot of DB at every n minutes
+    - Append only File. AOF. which writes every txn in file
+    - Want to have caching which supports data types ?
+      - Consider Redis. It supports multiple data types
+  - Redis as PubSub
 - You can configure the channel and subscribers can subscribe to it.
-Thinking about idempotency…
-means..Multiple req has same result. 
-Like, user can like post only once even after multiple api hits.
-Payment should be considered only once even if retried.
-If you don't retry API then idempotency is not required.
-Generate some ID like paymentID before hitting payment api, so even on retry Payment gw can know if the req is coming for the first time or second time and appropriately can respond.
-Protobuf 
-Cassandra..
-Good at: write heavy, read less & query on key & distributed and can save large amount of data
-Bad at: random queries, aggregations
-RAID
-A Redundant Array of Independent Disks (RAID) is a set of multiple drives put together with the purpose of improving a single drives performance. 
+- Thinking about idempotency…
+  - means..Multiple req has same result. 
+  - Like, user can like post only once even after multiple api hits.
+  - Payment should be considered only once even if retried.
+  - If you don't retry API then idempotency is not required.
+  - Generate some ID like paymentID before hitting payment api, so even on retry Payment gw can know if the req is coming for the first time or second time and appropriately can respond.
+- Cassandra..
+  - Good at: write heavy, read less & query on key & distributed and can save large amount of data
+  - Bad at: random queries, aggregations
+- RAID
+  - A Redundant Array of Independent Disks (RAID) is a set of multiple drives put together with the purpose of improving a single drives performance. 
 Use case for Document DB..
-If the data in your application has a document-like structure (i.e., a tree of one-to-many relationships, where typically the entire tree is loaded at once), then it’s probably a good idea to use a document model.
-We are saved here from joins..
-Document DB supremacy…
-The main arguments in favor of the document data model are schema flexibility, better performance due to locality, and that for some applications it is closer to the data structures used by the application. The relational model counters by providing better support for joins, and many-to-one and many-to-many relationships.
-Relationship among data preference…
-1:many -> Document DB
-Many:1 -> Relational
-Many:Many -> ( Relational <<< Graph Model) is more useful here.
-
+- If the data in your application has a document-like structure (i.e., a tree of one-to-many relationships, where typically the entire tree is loaded at once), then it’s probably a good idea to use a document model.
+  - We are saved here from joins..
+- Document DB supremacy…
+  - The main arguments in favor of the document data model are schema flexibility, better performance due to locality, and that for some applications it is closer to the data structures used by the application. The relational model counters by providing better support for joins, and many-to-one and many-to-many relationships.
+- Relationship among data preference…
+  - 1:many -> Document DB
+  - Many:1 -> Relational
+  - Many:Many -> ( Relational <<< Graph Model) is more useful here.=
 - ACID properties
   - Atomicity : Either txn happenes or do not happen, there is no intermediate state
   - Consistency
   - Isolation: Multiple txn occurs independently without interference
   - Durability
-- PACELC theorem
-  - PACELC theorem is an extension to the CAP theorem. It states that in case of network partitioning (P) in a distributed computer system, one has to choose between availability (A) and consistency (C) (as per the CAP theorem), but else (E), even when the system is running normally in the absence of partitions, one has to choose between latency (L) and consistency (C).
 - When writing db query…
   - Always validate query params
   - Carefully check edge case if query can scan millions of rows due to bad output.
@@ -138,43 +129,44 @@ Many:Many -> ( Relational <<< Graph Model) is more useful here.
     - Peer 2 Peer : Anyone can talk to anyone
     - Uses UDP
     - Developed by google, good for audio/video streaming
-
-Prometheus and Grafana
-Prometheus query language which collects data and gives queried results.
-Used LevelDB for indexes
-It also has local storage sub system which organizes data in chinks of constant size. Chinks stored in file per time series.
-Graphs is a visualization tool which transforms metrics into visualization.
-Database per service pattern
-NO direct DB access: loosely coupled system
-Can use diff DB, scale independently
-Avoid single point of failure, one DB down do not affect other services
-For compliance
-Complexities:
-Multiple components needs to be synced which will have eventual consistency
-Distributed txn needs to be done which is complex
-Garbage collection
-Mark and Sweep algorithm: (indirect GC algo)
-Mark: do DFS and mark all live references starting from root
-Sweep: Free up memory which is not recognized in mark phase
-Root: registers, global variables, thread stack
-Make your application as async as possible
-To reduce blast radius
-To remove dependency
-The task which does not require a sync call should not be done sync.
-In master slave architecture write is performed on master only. So it is useful for reading heavy applications but write capacity does not increase much even after adding multiple masters also. Adding multiple masters has its own complexity.
-While changing DB index, we should analyze what other queries can go wrong and hit performance. ORMs are blind spots which queries they prepare and use. Check ORM queries periodically to check performance impact.
-API composition pattern in Microservices
-Problem: client needs to talk to multiple services in order to get all details like logistics, payment, order
-Put a composer in between who talks to all services and combine response
-User API gateway as a composer
-Simple to implement, low latency and api calls on client side, hides implementation, can work as rate limiting as well
-Problem with availability, data consistency and distributed transactions.
-Problem if one of the service goes down
-Tools: KrakenD, Kong, Managed API gw services
+    - Reactive: Can adjust based on network speed / network loss
+    - In Video calls, Processing mainly happens in Client side. 
+- Prometheus and Grafana
+    - Prometheus query language which collects data and gives queried results.
+    - Used LevelDB for indexes
+    - It also has local storage sub system which organizes data in chinks of constant size. Chinks stored in file per time series.
+    - Graphs is a visualization tool which transforms metrics into visualization.
+- Database per service pattern
+  - NO direct DB access: loosely coupled system
+  - Can use diff DB, scale independently
+  - Avoid single point of failure, one DB down do not affect other services
+  - For compliance
+  - Complexities:
+    - Multiple components needs to be synced which will have eventual consistency
+    - Distributed txn needs to be done which is complex
+- Garbage collection
+    - Mark and Sweep algorithm: (indirect GC algo)
+    - Mark: do DFS and mark all live references starting from root
+    - Sweep: Free up memory which is not recognized in mark phase
+    - Root: registers, global variables, thread stack
+- Make your application as async as possible
+  - To reduce blast radius
+  - To remove dependency
+  - The task which does not require a sync call should not be done sync.
+- In master slave architecture write is performed on master only. So it is useful for reading heavy applications but write capacity does not increase much even after adding multiple masters also. Adding multiple masters has its own complexity.
+- While changing DB index, we should analyze what other queries can go wrong and hit performance. ORMs are blind spots which queries they prepare and use. Check ORM queries periodically to check performance impact.
+- API composition pattern in Microservices
+  - Problem: client needs to talk to multiple services in order to get all details like logistics, payment, order
+  - Put a composer in between who talks to all services and combine response
+  - User API gateway as a composer
+    - Simple to implement, low latency and api calls on client side, hides implementation, can work as rate limiting as well
+    - Problem with availability, data consistency and distributed transactions.
+    - Problem if one of the service goes down
+    - Tools: KrakenD, Kong, Managed API gw services
 - Dead letter queue
   - A separate queue from the main/live queue where we can store messages after N retries which cant be processed but may require engineering input to check the problem.
-High load on DB : In some cases where write on DB is high on specific times and if we can wait for some time to reflect data in DB then asynchronous write can be one option where all DB writes will go via queue.
-Serverless Architecture: If processing is based on some events and load is not continuous and is very less then lambda like service can be used which is serverless. It’s highly cost effective.
+- High load on DB : In some cases where write on DB is high on specific times and if we can wait for some time to reflect data in DB then asynchronous write can be one option where all DB writes will go via queue.
+- Serverless Architecture: If processing is based on some events and load is not continuous and is very less then lambda like service can be used which is serverless. It’s highly cost effective.
 - DynamoDB
   - NoSQL key value store fully managed by amazon with a very low latency
 - When you want to ensure data consistency between 2 tables. One approach is 2 way handshake
@@ -195,6 +187,28 @@ Serverless Architecture: If processing is based on some events and load is not c
 # Authentication (TBA)
 - How api requests will be authenticated
 - How Authorisation will work ?
+
+# CAP Theorem
+
+- Consistency: Each nodes reurns latest data
+- Availability: Each request returns non error response
+- Partition tolerance: Even when some nodes are disconnected in network or having delays System is up and running
+
+- CAP theorem: Any n/w shared system can not have all 3 properties. Need to sacrifice one of them
+  - We have all 3 Characteristics as long as there is no network failure.
+  - If partition happend then non-sync nodes will become unavailable and may return error to connected clients. 
+  - CP system : Availavility is sacrified when Partition happens in distributed system.
+    - Useful in Banking system
+    - MongoDB, Apache HBase, Couchbase, Redis
+  - AP Systen: Always available with eventual consistent data
+    - Offers eventual consistency
+    - Very useful when hige number of data needs to be processed and System must be available all the time
+    - Cassandra, CosmosDB, Amazon DynamoDB, CouchDB
+  - CA System: 
+    - CS database cant exists in distributed systems except MySQL Dbs
+    - Ex. PostgreSQL, MySQL --> Microsoft SQL Server, Oracle, MySQL
+
+- PACELC theorem: PACELC theorem is an extension to the CAP theorem. It states that in case of network partitioning (P) in a distributed computer system, one has to choose between availability (A) and consistency (C) (as per the CAP theorem), but else (E), even when the system is running normally in the absence of partitions, one has to choose between latency (L) and consistency (C).
 
 # Service Discovery
 
@@ -240,9 +254,6 @@ Serverless Architecture: If processing is based on some events and load is not c
 - **API Gateway**
   - Extension of reverse proxy
 
-
-
-
 # References
 - https://github.com/donnemartin/system-design-primer
 - DDIA notes: https://docs.google.com/document/d/1Yn6ee7WEK6r6q49mVX7uqbEtoYc9zizaQeIQy_c9Oh8/edit
@@ -250,3 +261,4 @@ Serverless Architecture: If processing is based on some events and load is not c
 - https://www.youtube.com/c/HusseinNasser-software-engineering/videos
 - [Mark and Sweep Garbage Collection Algorithm] https://www.youtube.com/watch?v=4qLf0FJMyf0
 - https://systemdesign.one/
+- Interview Prepration Medium Article: https://medium.com/double-pointer/system-design-interview-course-31ddb8dfdafc

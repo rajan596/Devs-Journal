@@ -367,3 +367,6 @@ Future can be cancelled.
 ## Garbage Collector
 
 - *Garbage collector when executes stops complete JVM execution*
+
+### References:
+- [Mark and Sweep and Reference Counting Algorithms](https://medium.com/double-pointer/system-design-interview-designing-a-garbage-collection-system-81a54eb1a582)

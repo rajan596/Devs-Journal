@@ -7,6 +7,7 @@
         3. **Builder** : Builds complex object 
         4. Prototype : to create duplicate object
         5. **Singleton** : Single object of a class.
+        6. Object Pool
     * Structural Patterns : How more than one class/objects are structured
         1. **Adaptor**
         2. Bridge
@@ -130,6 +131,63 @@ Clients need not worry when references object using interface/abstract class whi
 
 ### Singleton design pattern
 
+### Object Pool Pattern
+
+- Used to manage reusable pool of object
+- Philosophy: Pick object from pool, use, again return it to pool
+- 2 Important points
+    - DbConnectionPoolManager should be a Singleton Class
+    - Aquiring and releasing resource should be Thread safe operation
+
+```java
+class Client {}
+
+class DbConnectionPoolManager {
+    List<DbConnection> inUseDbConnection;
+    int initialPoolSize;
+    int maxPoolSize;
+    List<DbConnection> availableDbConnection;
+
+    DbConnectionPoolManager(int initialPoolSize){
+        for(int i=0;i<initialPoolSize; i++){
+            availableDbConnection.add(new DbConnection());
+        }
+    }
+
+    DbConnection getDbConnection(){
+        lock.aquire();
+        DbConnection dbConnection = availableDbConnection.get();
+        availableDbConnection.remove(0);
+        inUseDbConnection.add(dbConnection);
+        lock.release();
+        return dbConnection;
+    }
+
+    void releaseResource(DbConnection dbConnection){
+        lock.aquire();
+        availableDbConnection.add(dbConnection);
+        inUseDbConnection.remove(dbConnection);
+        lock.release();
+    }
+}
+
+class DbConnection {
+    Connection conn;
+
+    DbConnection(){
+        conn = Utility.createConnection("url:port");
+    }
+}
+```
+
+Advantages:
+    - Reduce overhead of frequently used expensive/resource intentive object creation Like DbConnections
+    - Reduce latency as objects already initialised
+    - Prevent resource exhaustion
+Disadvantages: 
+    - Resource leakage if not handled properly
+    - Additional complexity to manage pool
+    - Thread safery required in pool management
 
 ## Structural Patterns
 These patterns explain how to assemble objects and classes into larger structures while keeping these structures flexible and efficient.
@@ -172,6 +230,60 @@ Points
 References: 
     - https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
     - https://refactoring.guru/design-patterns/chain-of-responsibility
+
+### Mediator Pattern
+
+- Different objects communicate through **Mediator** allowing loose coupling
+- 
+
+```java
+interface Colleague {
+    void placeBid(int bidAmount);
+    int receiveBidNotification();
+    String getName();
+}
+
+class Bidder implements Colleague {
+    String name;
+    AuctionMediator mediator;
+
+    Bidder(){
+        mediator.add(this);
+    }
+
+    placeBid(int amount){
+        mediator.placeBid(this, amount);
+    }
+
+    ...
+}
+
+interface AuctionMediator {
+    void addBidder(Colleague bidder);
+    void placeBid(Colleague bidder, int amount);
+}
+
+class Auction implements AuctionMediator {
+    List<Colleague> colleagues;
+
+    Auction(){
+        colleagues = new ArrayList<>();
+    }
+
+    addBidder(Colleague bidder){
+        colleagues.add(bidder);
+    }
+
+    void placeBid(Colleague bidder, int amount){
+        for(Collegue clg : colleagues){
+            if(!clg.getName.equals(bidder.getName())) {
+                clg.receiveNotification(amount);
+            }
+        }
+    }
+}
+
+```
 
 ### Strategy Pattern
 Deciding behavior class based on strategy.

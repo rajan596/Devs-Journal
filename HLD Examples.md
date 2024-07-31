@@ -13,3 +13,17 @@ References:
 - Google S2
     - In-memory solutio provided by Google library
     - Good for Geo fencing solutions
+
+# Video Streaming / Chat App
+
+### Important Points:
+- Selection on Communication Protocol
+    - HTTP / HTTP Long Polling: 
+        - Single Directional Protocol
+        - TCP conn terminates upon response. 
+        - Overhead of TCP conn creation and termination
+    - WebSocket: 
+        - Bi-directional comm protocol
+
+### References:
+1. [Zoom System Design | System Design Video Application | System design of Zoom/Teams Application](https://www.youtube.com/watch?v=lrMon5qlHAg)
