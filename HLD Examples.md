@@ -13,6 +13,14 @@ References:
 - Google S2
     - In-memory solutio provided by Google library
     - Good for Geo fencing solutions
+    - Allows to draw a circle of 2-3 Kms (or any custom number) and can be helpful locating things there
+- Geo Hashing
+    - Popular concept used by Yelp and other proximity systems
+    - GeoHash String will look something like this -> skb6tyu. Here 1 string character can represent specific cell in a N x M grid.
+        - Here if zooming is requires then sk will be considered. appending one character to geohash increases accuracy and decreases area size.
+        - geoHash string can be constructed until desired level of precision is achieved
+    - Data Storage
+        - One of the approach to store the data is to partition data based on Consistent Hashing
 
 # Video Streaming / Chat App
 

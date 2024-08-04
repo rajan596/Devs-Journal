@@ -196,6 +196,34 @@ These patterns explain how to assemble objects and classes into larger structure
 
 ### Bridge
 
+- Similar to Strategy design pattern
+- Difference
+    - Intent of Strategy is to change behaviour of object at run time
+    - Intent of Bridge is Both abstract class's child and implementation classes can grow independently
+- Definition: It lets you split a large class or set of closely related classes into 2 separate hierarchie 1) abstraction and 2) Implementation which can be developed independently
+- This pattern tries to solve problem by switching from inheritance to composition
+- Abtraction is generally what client application will call and which will act as a controller and Implementation classed will do the actual job
+
+![alt text](image.png)
+
+We can have M x N combinations using above method. If we were to use Inheritance we would need to create MxN classes.
+Here only M+N classed are required to be created.
+
+```java
+abstract class Shape { // This is abtsraction
+    Color color;
+}
+class Square {}
+class Rectangle {}
+
+interface class Color { doColor(); } // This is implementation
+class RedColor { doColor(){} }
+class BlueColor { doColor(){} }
+```
+
+References:
+- [Refactoring Guru](https://refactoring.guru/design-patterns/bridge)
+
 ### Composite
 - ** Object Inside Object **
 - Like File System, Employee Hierarchy or Tree Like structure Composite pattern can be used.
@@ -231,10 +259,22 @@ References:
     - https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
     - https://refactoring.guru/design-patterns/chain-of-responsibility
 
+###  Interpreter
+
+- Interpret expression using a Context
+- It has
+    - Context: 
+    - Abstract expression: 
+        - Terminal expression: 15
+        - Non termnal expression: (15 + 26) 
+
+```java
+[TBD]
+```
+
 ### Mediator Pattern
 
 - Different objects communicate through **Mediator** allowing loose coupling
-- 
 
 ```java
 interface Colleague {
@@ -340,6 +380,42 @@ class FileUploadStrategies {
     }
 }
 
+```
+
+### Template pattern
+
+When to use ?
+- This is behaviral pattern
+- When we need our classed to 
+    - **follow specific steps (template) but also**
+    - give flexibility to customise the behaviour
+
+```java
+abstract class PaymentTemplateClass {
+    abstract void validateReq(Payment payment);
+    abstract void debit(Payment payment);
+    abstract void credit(Payment);
+
+    /*
+    This is a template for payment workfloe execution but there are abstract method being used
+    This class acts as a template and 
+        Child classed need to fill-in remaminng part as per their customised behaviour.
+    */
+    public final void doTransaction(Payment payment){
+        if(validateReq(payment)) {
+            debit(payment);
+            credit(payment);
+        } else {
+            // Inform not possible by throwing exception
+        }
+    }
+}
+
+class Cashpayment extends PaymentTemplateClass{
+    void validateReq(Payment payment){ // do something }
+    void debit(Payment payment){ // do something }
+    void credit(Payment){ // do something }
+}
 ```
 
 ### Observer Pattern

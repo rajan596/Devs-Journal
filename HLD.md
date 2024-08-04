@@ -224,6 +224,147 @@ Use case for Document DB..
 - References:
   - https://www.youtube.com/watch?v=UF9Iqmg94tk
 
+# Replication
+
+3 Main methods to replicate the data
+
+### Single leader replication
+- One Leader, Multiple followers. Or Master ->>> Slave
+- Leader handles Write requests and read (when req) and Followers handles read requests only
+- Followers keep syncing with Leaders updated date. They may fall behind
+- Types of replications
+  - Async Replication:
+    - Write are accepted by leader, committed locally and returned success to client assuming it will forward the data without fail (or with crash condition as well)
+    - This wasy data replication is async with respect to user write request
+    - Con: Does not guarentee durability in case leader node crahes/ fails to propogate changes
+    - Pros: Faster in terms of write requests
+  - Sync Replication:
+    - Leader commit changes locally, forward update to all followers, upon receicing ack from all followers client gets success response
+- When new follower joins...
+  - Leader maintains periodic snapshot (replication logs)
+  - When new follower joins snapshot is sent to follower with log sequence number OR binlog cordinates details
+  - all the updates after log seq no is also sent to follower
+- When fololowers gets offline
+  - follower must know last txn it completed
+  - It then tries to execute all txn after that seq no
+  - If leader rolls over txn logs and follower comes online after that period then syning becomes very difficult
+- Handling leader failure
+  - Periodically check heart beat of Leader and check if its dead
+  - One of the follower becomes new leader. It may follow leader election. Follower with most up to date data should be elected as new leader to have min data loss
+  - configure clients to redirect writes to new leader
+  - all followers to sync with new leader
+  - If old leader comes online it will act as a follower and not a leader
+- **Split Brain**
+  - When 2 node believes each one of them is leader and advertise to the clients
+  - Both starts to accept write and results in conflicts or data loss or data curruption
+- Deciding timeout for leader failover
+  - If too short then any network delay or big query can cause false failover
+  - If too big then.. It may cause system to unavailable for that time an potential data loss
+- Types of log replication
+  1. Statement based: 
+    - Approach: Log all the SQL statements and propogate to followers
+    - problems:
+      - statements like now() and rand() can result in non-deterministic behaviour on follower nodes. In this case master can replace non-deterministic values with actual values
+      - Triggers, stored procedures can have diff outcomes in diff follower nodes. Care must be taken here.
+  2. Write ahead log (WAL):
+    - It is append only file
+    - Log may be one that stores data for SSTables of LSM Tree
+    - A log to track every change when its B tree as a storage structure
+    - Kafka is based on WAL
+    - Problems:
+      - Size of WAL can grow too large
+      - WAL is couples with the storage engine. When upgrading version it becomes problamatic to upgrade cluster by upgrading replicas and doing failover
+  3. Logical or row based:
+    - Decouples logs with storage engine selection
+    - Log Logical things like 
+      - row insert -> log all columns
+      - row update -> log all the changes to column
+      - row delete -> log primary key
+    - Also called *change data capture*
+    - Pros: Any storage engine can read logical changes and can be exported to any external system
+  4. Trigger based replication:
+    - Works on triggers. Trigger is handled by Application code which decides to replicate code or not ?
+    - Higher overhead compared to other methods
+    - Normally coping changes to seperate table where external process can read
+- Ideal choice when application is read heavy. Followers can be increased as read load increases
+- Single leader is bottleneck when write requests increases
+- Delay between write happening on master and follower is called **Replication Lag**
+- Follower catch-up with master eventually which is called as **Eventual consistency**
+- Read after write consistency OR Read your own write : This is a guarantee that a user is always able to immediately read the writes user has submitted
+  - To achieve read after write consistency, Required queries need to made on Leader node
+- **Monotonic Reads**: Reading old data after reading latest data from replicas
+- **Consistent Prefix Read**: The consistent prefix reads guarantee says that if a sequence of writes happen in a certain order then the writes are served to the reader in the same order.
+
+### Multi leader replication
+- Multiple leader accepts write
+- Also called as master-master or active/active replication
+- Each node processing a write must forward all updates to other leader nodes and accept updates from other leader nodes.
+- Use cases: 
+  - multiple data centre and data is served to user from closer data centre
+  - To handle failure of complete data centre
+- Similar exampled
+  - Working on multiple devices which all handles write while being offline and when online propogates write to other devices and gets synced
+  - Online colloborative editing software: Google Docs
+- Pros
+  - This strategy is better when *Network Problem* happens. When 2 data centre experiences networ partition they can still serve write requests and eventually gets synces with other leaders.
+  - If one data centre fails we still have data with other leaders and this one can come up online and gets synces. In single leader follower will be promoted as Leader which may encounter data loss depending on replication strategy.
+- Cons
+  - Same data modified in multiple leaders needs **conflict resolution**
+  - Writes will lost from leader if its not replicated to other leader
+  - For DB, auto increment, trigger and integrity can be problamatic to maintain
+- Conflict Avoidance
+  - Route all updates for a user to same leader so all sub sequent writes are serialised.
+    - Problems: When user moved geo or when data centre experiences failure
+- Conflict Resulution
+  - **Latest write wins**: maintain latest write and override it. Cassandra uses it. It resolves conflicts with the cost of *durability*.
+    - Bad choice is data loss is unacceptable.
+    - Can be used in Cache system where data loss is tolerable.
+    - Cassandra recommends using immutable keys ( using UUID) that once written dont change to aovid data loss. 
+  - Merge/Concatenate writes and let user decide the result. Evernote does the same it will display B/C to user.
+  - Store conflicting write to separate Data structure and custom application code resolves it.
+- Automatic Conflict Resolution
+  - Google Doc: uses operational transormation technology
+  - Git: mergeable persistant data structures which maintains version history and have ability auto resolve conflicts.
+- Multi leader topologies
+  - All to All: Each leader writes data to all other leader
+  - Circular: Leader node replicates data to adjacent clockwise or anti clockwise leader node.
+  - Star: One node forwards update to all other nodes
+
+### Leaderless replication
+- DBs using leaderless replication
+  - Amazon Dynamo DB
+  - Cassandra
+  - Riak
+  - Voldemort
+- Read Repair: When client reads and checks for latest data, client can sub sequently write the latest data to the replica
+- Anti entropy Process: Background process on replica nodes checks other replicas, checks difference and syncs with its value
+
+##### Quoram: 
+- **W + R > N**
+- W: No. of write to nodes before sending ack
+- R: No. of read from nodes before sending response
+- N: No. of Replica nodes in cluster 
+- In reality cluster can have 1000s of nodes but designated node for replication will be only subset of nodes.
+- Like For key x -> Replicate on A,B,C nodes
+- A system with N nodes can tolerate floor(N/2) node failures. Generally N is odd number.
+- Reads will fail when fewer than R nodes are available and writes will fail when fewer than W nodes are available.
+- When multiple nodes can accept write -> Problem is when concurrent write happens for same record on multiple nodes. <CONFLICT>
+
+Sloppy Quorum: 
+- When write request comes and all designates subset of nodes for writes are not available then write is made at non designates nodes and Write req is accepted.
+- Cassandra, Dynamo, Voldemort, all offer sloppy quorum feature.
+- Later on when all the designated nodes that should replicate the value become reachable, the value is copied over to these designated nodes from the nodes that temporarily hold the value. This is known as hinted handoff.
+
+References:
+- https://medium.com/double-pointer/system-design-interview-course-31ddb8dfdafc
+
+### Version Vector
+
+- Version per Key schema
+- WHen multiple replicas are involved each replica is assiged a version for each key
+
+<TBD: Learn more about version vectors>
+
 # Load Balancing vs Reverse Proxy vs API Gateway
 
 - **Load Balancing** 
@@ -253,6 +394,16 @@ Use case for Document DB..
     - It can cache the response
 - **API Gateway**
   - Extension of reverse proxy
+
+# Spark : Stream Processing Unit
+- Can be used to consume data from Kafka and generate reports in real-time <To be confirmed>
+- 
+
+# Hadoop
+- Use cases:
+  - Pulling out reports
+  - Custom queries on data for analytics purpose
+
 
 # References
 - https://github.com/donnemartin/system-design-primer
