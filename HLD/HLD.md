@@ -365,6 +365,65 @@ References:
 
 <TBD: Learn more about version vectors>
 
+# Partition
+
+#### Ways of Partitioning
+1. Random
+    - Problem at the time of retrieval
+2. By Range
+    - Like for number key.. 1-100 in one partition, 101-200 2nd partition
+    - A-E, F-J, Etc...
+    - Problems:
+        - data volume across all nodes can vary. Hotspot
+    - Multi column composed based partition can also be created like {Character}-{year}
+3. Hash based
+  - Overcomes the issue of hotspots
+  - Simple hash Fn like MD5 can also be used.
+  - When certain key have more read/write pattern still hotspot can occur based on query pattern
+4. Modulo based partitioning
+  - Not recommended
+  - When hash is calculated and modulo is taken by No. of Hosts when server number will come up
+  - Problem with this approach is when nodes are added or deleted then..modulo will change and data will move to different nodes.
+
+#### No. of Partitions
+1. Fixed no. of partitions
+  - We can have only fixed no. of partitions from begining which cant change afterwards
+  - Difficult to guess in advance how many partitions will be required
+  - When new node joins it takes some partitions
+  - When some node leaves those partitions are given to existing nodes
+  - In practice, global secondary indexes are usually updated asynchronously.
+2. Dynamic no. of partitions
+  - **HBase, RethinkDB, and MongoDB** are examples of some databases that allow for partitioning dynamically
+  - When partition becomes bigger -> splits into 2 partition
+  - When partition becomes smaller -> Merges with adjacent partition
+3. Partition by no. of node
+  - Keep no of partitions to no of nodes in cluster
+  - if new node joins one of the node's partition splits and given to new node
+  - Two systems, Cassandra and Ketama use this approach when partitioning
+  - If new nodes keep getting added to the system as the data size grows then the size of the partitions remains fairly stable.
+
+#### Routing request to correct partition
+- Each nodes knows where the data lies in partition. When req comes it will get data from partition and respond to client
+- Routing layer which forwards the req to correct node
+- Client knows and contact node directly
+- **HBase, Kafka and SolrCloud** use **Zookeeper** to track partition assignments
+- An alternative to configuration servers used by Cassandra and Riak is to disseminate cluster changes to all the nodes in the cluster using a gossip protocol. 
+
+#### Secondary Indexes when Partitioned data
+1. Document based
+  - Secondary indexes are maintained for the data present on that node (partitioned by partition key)
+  - Also called as Local indexes instead of Global index
+  - Pros:
+    - When record crud operation happens, Secondary indexes also updates
+  - Cons:
+    - For read query on secondary index all partition needs to be scanned
+  - Querying several partitions in this fashion can prove to be expensive but many datastores including Cassandra, SolrCloud, ElasticSearch, MongoDB, etc use it.
+2. Term bases partitioning of secondary indexes
+  - Here global index is maintained but secondary index itself is partitioned
+  - In practice, global secondary indexes are usually updated asynchronously.
+
+- Cassandra and MongoDB use MD5 for hashing.
+
 # Load Balancing vs Reverse Proxy vs API Gateway
 
 - **Load Balancing** 
@@ -397,7 +456,8 @@ References:
 
 # Spark : Stream Processing Unit
 - Can be used to consume data from Kafka and generate reports in real-time <To be confirmed>
-- 
+
+<To get more understading>
 
 # Hadoop
 - Use cases:
