@@ -247,6 +247,10 @@ References:
     - Proxy can be pre and post processing for logging, sending matrics, etc 
 - Important points
     - In Proxy same **Interface** is shared between service class and a proxy class
+- Benifits
+    - Proxy uses same interface for both service class and our custom proxy class. So, even if client code is written using Interface we can replace the implementation without much changes.
+    - Service class instantiation stays with proxy class
+    - client will initialise proxy class and use it
 - References
     - [Shreyansh Jain YT](https://www.youtube.com/watch?v=9MxHKlVc6ZM&list=PL6W8uoQQ2c61X_9e6Net0WdYZidm7zooW&index=15) 
     - [Refactor Guru](https://refactoring.guru/design-patterns/proxy)
@@ -258,7 +262,7 @@ classDiagram
     Client --> ProductService
     ProductService <|-- ProductServiceImpl
     ProductService <|-- ProductServiceCustomImpl
-    ProductServiceCustomImpl --> ProductServiceImpl
+    ProductServiceProxy --> ProductServiceImpl
     ProductService : +Product getProductById(String productId)
     class Client {
         - ProductService productService
@@ -266,14 +270,49 @@ classDiagram
     class ProductServiceImpl {
         +Product getProductById(String productId)
     }
-    class ProductServiceCustomImpl{
+    class ProductServiceProxy{
         +Product getProductById(String productId)    
     }
 ```
 
----
+**Java Implementation**
 ```java
+interface  ProductService {
+    Product getproductById(String productId);
+}
 
+class ProductServiceImpl implements ProductService{
+    @override
+    Product getproductById(String productId) {
+        // HTTP call to fetch Product from Product service
+    }
+}
+
+class ProductServiceProxy implements ProductService{
+
+    private CacheService cacheService;
+    private ProductServiceImpl productServiceImpl = new ProductServiceImpl();
+
+    @override
+    Product getproductById(String productId) {
+        // Can do validations to ensure proper use of sdk
+        if(StringUtils.isEmpty(productId)) {
+            throw Exception("Invalid productId");
+        }
+
+        // Can check chached data
+        if(cacheService.isPresent(productId)) {
+            return cacheService.get(productId);
+        }
+        return productServiceImpl.getproductById(productId);
+    }
+}
+
+class Client {
+    ProductService productService = new ProductServiceProxy();
+
+    Product product = productService.getProductbyid("product_id");
+}
 ```
 
 ## Behavioral patterns
@@ -310,12 +349,45 @@ TODO
 
 ### Memento Design Pattern
 
-- Useful when object state needs to be maintained to support Undo Functionality or restore at specific snapshot version
+- Useful when object state needs to be maintained to support Undo Functionality or restore at specific snapshot version. **Maintain History**
 - It does not expose internal implementation
-- Imp Point: 
+- It has 3 components
+    - Originator
+        - This is the original class whose state's snahshot should be taken
+        - It is responsible for producing snapshot and restoring from a given Mememto class
+    - Mememto:
+        - Special class which stores state of orginal class
+        - Should have all fields as immutable and recomemnded be created via constructor.
+        - Memento is generally sub class of originator which lets originator access all states of Memento
+        - Doesn't declare any public field or getter or setter methods.
+    - Caretaker:
+        - Maintains history of mememto
+        - Caretaker dont have visibility in Memento class and cant't temper its state
 
-```java
+```mermaid
+classDiagram
+    ChessBoard <--> ChessBoardSnapshotMemento
+    ChessBoardCommandCareTaker <-- ChessBoardSnapshotMemento
+    class ChessBoard {
+        - Pieces pieceState[8][8]
 
+        + ChessBoardSnapshotMemento createSnapshot()
+        + restoreSnapshot(ChessBoardSnapshotMemento snapshot)
+    }
+    class ChessBoardSnapshotMemento {
+        - Pieces pieceState[8][8]
+        - ChessBoard originalChessBoardObj
+
+        + ChessBoardSnapshotMemento(ChessBoard originalChessBoardObj, Pieces pieceState[][])
+        - ProductService productService
+    }
+    class ChessBoardCommandCareTaker {
+        - List<ChessBoardSnapshotMemento> history
+
+        + ChessBoardSnapshotMemento undo()
+        + add(ChessBoardSnapshotMemento)
+        + doSomeTask() // Will take snapshot of originator and then alter originator
+    }
 ```
 
 ### Interpreter
