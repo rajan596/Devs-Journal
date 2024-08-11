@@ -1,11 +1,8 @@
 
-## General Concepts
-
-- Understand JVM:
-    - TBD
+# General Concepts
 
 
-## Streams in Java
+# Streams in Java
 - Input from terminal : System.in is used to take input from terminal
 ```java
 Scanner sc = new Scanner(System.in); // As System.in alone cant read inputs from terminal
@@ -363,10 +360,16 @@ Can be used for async tasks. Simply put them in future and then get the result u
 While calling get() method it blocks the flow and wait for the task to complete and then returns the result.
 Future can be cancelled.
 
+# Multi Threading in Java
 
-## Garbage Collector
+- Process: Program under execution (loaded in memory). Program resides in disk.
+- Thread: 
+
+# JVM
+
+# Garbage Collector
 
 - *Garbage collector when executes stops complete JVM execution*
 
-### References:
+# References:
 - [Mark and Sweep and Reference Counting Algorithms](https://medium.com/double-pointer/system-design-interview-designing-a-garbage-collection-system-81a54eb1a582)

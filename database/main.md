@@ -132,8 +132,69 @@ Isolation: How 2 parallel transaction can affect each other. 2 Transactions are 
 4) Cassandra
 - #NoSQL #ACID
 - written in Java
-- JVM paused execution while garbege collection
+- JVM pauses execution while garbage collection
 
 5) ScyllaDB
 - #NoSQL #ACID
 - Cassandra compatible DB written in C++
+
+# Database Internal Notes ([Educosys Playlist](https://www.youtube.com/watch?v=8ogJlOIxKVE))
+
+## Components in a Database
+
+- FrontEnd components : Interacts with client Requests
+    - Tokeniser: Breaks down query in tokens
+    - Parser: Analyse the query syntactically and check grammer rules
+    - Optimiser: Determines the most efficient execution plan. Like which index to use.
+- Backend Components : Backbone of DB
+    - Execution Engine
+        - Query Executor: Works on the query execution plan prepared by optimiser
+        - Cache manager: Cache required DB data like frequently accessed to improve DB performance
+        - utility services: Can manage Auth, backup, etc
+    - Transaction manager: For Txn management support
+        - Lock Manager: Manages locks for concurrent query execution and can be used in transactions. **Concurrency Control**
+        - Recovery Manager: Ensures data **durability**
+    - Concurrency Manager
+    - For distributed DB support
+        - Shard manager : Responsible for managing sharded DB nodes
+        - Cluster manager: Manages cluster
+        - Replication Manager: Copy data across servers to maintain **High availability, Data Redundancy, Disaster Recovery**
+    - Storage Engine
+        - Disk storage manager: Manage physical storage of data on Disk
+        - Buffer manager: Loads block of disk data in-memory for processing / update
+        - Index manager: Manages index on DB columns to ensure fast data retrieval
+    - OS Interaction Layer: Interacts with diff OS system for file operations
+
+
+## B Tree and B+ Tree in DBMS
+
+#### How data is read and write to Hard Disk
+- Hard disk has circular area called **Tracks** and pie shaped section called **Sectors**. 
+- Intersection of track and sector is called as **File Blocks** which is usually 4 KB of space.
+- Reading any data from this block requires loading entire block in RAM. 
+
+### B Tree
+- Main Idea: For CRUD Operations -> Reduce I/O Operations as I/O Operations are expensive
+- Problem with Binary Tree:
+    - For any read operation whole disk file block needs to be loaded in RAM which is 1 I/O operation
+    - Binary tree maintains only 2 child node references. So, There is higher io cost involved for eliminating hald of the DB records.
+    - If we could have get more information from loadef File block which will further reduce our search Space --> That is what we want.
+- So, B Tree is like M-Way tree which maintains data for M child nodes. Each B Tree node can have ~4KB(approximated) of data stored with it. So once loaded in RAM comparision can be done to lcoate the next IO block.
+- Characteristics
+    - This way $log_m(No. of Records)$ IO operations will be required.
+    - Optimal no. of keys to be stored in 1 tree node:-> No. of records which can be stored in one disk file block
+    - Order m Binary Tree: Max no of childs a node can have will be **m** and max. no of keys will be **m-1**
+    - Min no of keys a node except root should be $ceil(m/2)$
+    - All the leafs are at the same level
+    - Insertion:
+        - If node is filled with all keys then new node will be inserted above existing nodes.
+        - This way no. of multi level indexes increased as no. of record in DB increases.
+
+### B Tree vs B+ Tree
+
+| B Tree | B+ Tree|
+|--|--|
+| No linkage between leaf nodes | All Leaf node blocks are connected like linked list |
+| Can store data in intermediate nodes | Stores data only in lead nodes |
+| Not better than B+ tree in range query | Better in performing range queries because of leaf node linkage | 
+

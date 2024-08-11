@@ -1,4 +1,12 @@
 
+# Top K Problem
+
+**Problem:** Find Top K most viwed videos, Trending songs etc
+
+
+
+**References:**
+- [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/top-k)
 
 # Location Tracking System
 
