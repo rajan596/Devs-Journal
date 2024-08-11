@@ -238,7 +238,33 @@ References:
 ### Flyweight Design Pattern
 
 ### Proxy pattern:
-Useful to wrap out main method from client and put explicit sanity checks/ validations
+- Useful to wrap out main method from client and put explicit sanity checks/ validations
+- This is used in a daily practice.
+- Concept: Request to real object will go via proxy layer
+- Can be used for
+    - Access validation: Before doing actual task we autorise the request
+    - Caching: Proxy itself can cache and respond as per requirement
+    - Proxy can be pre and post processing for logging, sending matrics, etc 
+- Important points
+    - In Proxy same **Interface** is shared between service class and a proxy class
+- References
+    - [Shreyansh Jain YT](https://www.youtube.com/watch?v=9MxHKlVc6ZM&list=PL6W8uoQQ2c61X_9e6Net0WdYZidm7zooW&index=15) 
+    - [Refactor Guru](https://refactoring.guru/design-patterns/proxy)
+
+**Class Diagram**
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+---
+```java
+
+```
 
 ## Behavioral patterns
 These patterns are concerned with algorithms and the assignment of responsibilities between objects.
@@ -273,6 +299,14 @@ TODO
 ### Mediator Design Pattern
 
 ### Memento Design Pattern
+
+- Useful when object state needs to be maintained to support Undo Functionality or restore at specific snapshot version
+- It does not expose internal implementation
+- Imp Point: 
+
+```java
+
+```
 
 ### Interpreter
 
@@ -693,7 +727,3 @@ Think about concurrency in LLD interview
 - Command Design Pattern : https://medium.com/@learncsdesign/learn-the-command-design-pattern-60cad5b85e34
 - https://www.tutorialspoint.com/design_pattern/
 - https://refactoring.guru/design-patterns/catalog
-
-
-
-
