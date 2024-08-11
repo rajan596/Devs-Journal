@@ -254,11 +254,21 @@ References:
 **Class Diagram**
 
 ```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
+classDiagram
+    Client --> ProductService
+    ProductService <|-- ProductServiceImpl
+    ProductService <|-- ProductServiceCustomImpl
+    ProductServiceCustomImpl --> ProductServiceImpl
+    ProductService : +Product getProductById(String productId)
+    class Client {
+        - ProductService productService
+    }
+    class ProductServiceImpl {
+        +Product getProductById(String productId)
+    }
+    class ProductServiceCustomImpl{
+        +Product getProductById(String productId)    
+    }
 ```
 
 ---
