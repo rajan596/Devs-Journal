@@ -2,32 +2,32 @@
 * SOLID Principle
 * Design Patterns
     * Creational Patterns
-        1. **Factory** : creates and returns a new obj based on argument
-        2. Abstract Factory : factory of factory
-        3. **Builder** : Builds complex object 
-        4. Prototype : to create duplicate object
-        5. **Singleton** : Single object of a class.
-        6. Object Pool
+        1. [Factory](#factory-pattern) : creates and returns a new obj based on argument
+        2. [Abstract Factory](#abstract-factory-pattern) : factory of factory
+        3. [Builder](#builder-pattern) : Builds complex object 
+        4. [Prototype](#prototype-design-pattern) : to create duplicate object
+        5. [Singleton](#singleton-design-pattern) : Single object of a class.
+        6. [Object Pool](#object-pool-pattern)
     * Structural Patterns : How more than one class/objects are structured
-        1. **Adaptor**
-        2. Bridge
-        3. Composite
-        4. Decorator
-        5. facade
-        6. Flyweight
-        7. Proxy
+        1. [Adaptor](#adapter-design-pattern)
+        2. [Bridge](#bridge-design-pattern)
+        3. [Composite](#composite)
+        4. [Decorator](#composite-design-pattern)
+        5. [facade](#facade-design-pattern) **TODO**
+        6. [Flyweight](#flyweight-design-pattern)
+        7. [Proxy](#proxy-pattern)
     * Behavioral Patterns : How more than one objects communicate with each other
-        1. **Chain of Responsibility**
-        2. Command
-        3. Iterator
-        4. Interpreter
-        5. Mediator
-        6. Memento
-        7. **Observer**
-        8. **State** : When system can have multiple states
-        9. **Strategy**
-        10. Template
-        11. Visitor
+        1. [Chain of Responsibility](#chain-of-responsibility)
+        2. [Command](#command-design-pattern) **TODO**
+        3. [Iterator](#iterator-design-pattern)
+        4. [Interpreter](#iterator-design-pattern)
+        5. [Mediator](#mediator-design-pattern)
+        6. [Memento](#memento-design-pattern)
+        7. [Observer](#observer-pattern)
+        8. [State](#state-design-pattern) : When system can have multiple states
+        9. [Strategy](#strategy-pattern)
+        10.[Template](#template-pattern)
+        11.[Visitor](#visitor-design-pattern)
 
 ![Alt text](./assets/images/design-patterns.png)
 Credits: https://refactoring.guru/design-patterns/catalog
@@ -192,9 +192,9 @@ Disadvantages:
 ## Structural Patterns
 These patterns explain how to assemble objects and classes into larger structures while keeping these structures flexible and efficient.
 
-### Adapter
+### Adapter Design pattern
 
-### Bridge
+### Bridge Design Pattern
 
 - Similar to Strategy design pattern
 - Difference
@@ -204,7 +204,7 @@ These patterns explain how to assemble objects and classes into larger structure
 - This pattern tries to solve problem by switching from inheritance to composition
 - Abtraction is generally what client application will call and which will act as a controller and Implementation classed will do the actual job
 
-![alt text](image.png)
+![alt text](../LLD//assets/images/bridge_pattern.png)
 
 We can have M x N combinations using above method. If we were to use Inheritance we would need to create MxN classes.
 Here only M+N classed are required to be created.
@@ -224,7 +224,7 @@ class BlueColor { doColor(){} }
 References:
 - [Refactoring Guru](https://refactoring.guru/design-patterns/bridge)
 
-### Composite
+### Composite Design Pattern
 - ** Object Inside Object **
 - Like File System, Employee Hierarchy or Tree Like structure Composite pattern can be used.
 - Problem: 
@@ -232,6 +232,10 @@ References:
 ```java
 
 ```
+
+### Facade Design Pattern
+
+### Flyweight Design Pattern
 
 ### Proxy pattern:
 Useful to wrap out main method from client and put explicit sanity checks/ validations
@@ -259,7 +263,18 @@ References:
     - https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
     - https://refactoring.guru/design-patterns/chain-of-responsibility
 
-###  Interpreter
+### Command Design Pattern
+TODO
+
+
+### Iterator Design Pattern
+TODO
+
+### Mediator Design Pattern
+
+### Memento Design Pattern
+
+### Interpreter
 
 - Interpret expression using a Context
 - It has
@@ -417,6 +432,8 @@ class Cashpayment extends PaymentTemplateClass{
     void credit(Payment){ // do something }
 }
 ```
+
+### Visitor Design pattern
 
 ### Observer Pattern
 One data source object notifies all observers regarding data change. Observers can be added and removed at any time.
@@ -584,9 +601,6 @@ void addNewTopping(IPizza pizza, Topping topping){
 
 ![Alt text](./assets/images/decorator-example.png)
 
-## Command Design Pattern
-TODO
-
 ## State Design Pattern
 - Can use this when your system have multiple states and multiple events on same state
 - Can create interface of State with possible functionalities/event at each state
@@ -602,7 +616,6 @@ Examples:
 
 References
     - https://refactoring.guru/design-patterns/state
-    - 
 
 # Important LLD concepts
 
