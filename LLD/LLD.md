@@ -253,15 +253,15 @@ These patterns are concerned with algorithms and the assignment of responsibilit
 - Here each Handler should have reference to next handler.
 - This is mainly useful when requestor is unaware of which kind of Handler to use i.e, Log level Info,Errot,Critical which can be given at run time.
 
-Points
+**Points**
 - <Advantage> Decoupling between request and response processing
 - <DisAdvantage> Creates nesting which may result in a ling stack trace
 
 
+**References**
 
-References: 
-    - https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
-    - https://refactoring.guru/design-patterns/chain-of-responsibility
+- https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
+- https://refactoring.guru/design-patterns/chain-of-responsibility
 
 ### Command Design Pattern
 TODO
@@ -684,10 +684,9 @@ Think about concurrency in LLD interview
 5. Strive for loosely coupled designs between objects that interact.
     - Observer is such pattern
 
-# LLD Interview
+# LLD Interview Tips
 
-- Prefer to draw class diagram and connections. It helps conceptualise the design and ease out coding part
-- 
+[Refer this page](./LLD%20Interview.md)
 
 # References
 - LLD primer: https://github.com/prasadgujar/low-level-design-primer/blob/master/solutions.md
