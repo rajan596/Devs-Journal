@@ -466,7 +466,7 @@ References:
 
 
 # References
-- https://github.com/donnemartin/system-design-primer
+- https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**
 - DDIA notes: https://docs.google.com/document/d/1Yn6ee7WEK6r6q49mVX7uqbEtoYc9zizaQeIQy_c9Oh8/edit
 - https://drive.google.com/file/d/16wtG6ZsThlu_YkloeyX8pp2OEjVebure/view
 - https://www.youtube.com/c/HusseinNasser-software-engineering/videos

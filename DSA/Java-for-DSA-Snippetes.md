@@ -176,8 +176,6 @@ void dfs(int i, int j, char[][] grid,boolean visited[][]){
 }
 ```
 
-## Heap in Java
-
 ## Trie in Java
 
 ```java
@@ -316,13 +314,114 @@ public class Solution{
 ## Heap
 - Complete binary tree
 - Heap Operations
-    - Insert.
+    - Insert
+        - new elements gets inserted at the end of list and then heapify is called from bottom to top to maintain correct order
     - Extract min/max
+        - Required emement will present at root node i.e, 0th index. 
+        - We then need to fill emply space at root node with the last element of list and then call heapify downwards to maintain heap property
     - Heapify
+        - Upward: compare currentElement = i and parent element = (i-1)/2. Swap both if heap property is not maintained
+        - Downward: 
+            - Check root node(index), left node$(2*i+1), right node (2i+1)
+            - Maintain heap property by swapping min/max element to parent node i.e, i..
+    - Delete element at index
+        - Find Maximum element from heap say its X
+        - Create dummy value higher than X -> lets say X+1
+        - assign value higher than max from heap i.e, heap[index] = heap[0] + 1
+        - heapify till Root element
+        - Noe X+1 node will reach at root node.
+        - Delete root node and heapify again till leaf nodes 
+- Types of heap
+    - Min Heap: Element at top -> MIN among all elements
+    - Max Heap: Element at top -> MAX among all elements
 
 ```java
+class MaxHeap { // So, root node will have min element among all heap data
+    int size; 
+    int heap[];
+    int lastIndex;
+
+    public MaxHeap(int maxSize){
+        this.size = maxSize;
+        this.heap = new int[maxSize];
+        this.lastIndex=-1;
+    }
+
+    void insert(int value){
+        this.lastIndex++;
+        heap[this.lastIndex] = value;
+
+        int curr = this.lastIndex;
+        // Maintain heap property from bottom to top
+        while(curr > 0 && heap[parent(curr)] < heap[curr]){
+            // Needs swapping with parent node
+            int parentIndex= parent(curr);
+            swap(curr, parentIndex);
+            curr = parentIndex;
+        }
+    }
+
+    void int removeMax(){
+        int minElement = heap[0];
+        heap[0]=heap[this.lastIndex];
+        this.lastIndex--;
+        
+        heapify(0);
+    }
+
+    void heapify(int currIndex){
+        if(currIndex >= lastIndex) return;
+
+        // Heapify from top to bottom
+        int leftIndex   = left(currIndex);
+        int rightIndex  = right(currIndex);
+        int maxIndex    = currIndex;
+
+        if(leftIndex <= lastIndex && heap[leftIndex] > heap[currIndex] ) {
+            maxIndex = leftIndex;
+        }
+        if(rightIndex <= lastIndex && heap[rightIndex] > heap[maxIndex] ) {
+            maxIndex = rightIndex;
+        }
+        if(maxIndex != currIndex) {
+            swap(maxIndex, currIndex);
+            heapify(maxIndex);
+        }
+    }
+
+    void int findMax(){
+        return heap[0];
+    }
+
+    public int parent(int i){
+        return (i-1)/2;
+    }
+
+    public int left(int i){
+        return 2*i+1;
+    }
+
+    public int right(int i){
+        return 2*i+2;
+    }
+
+    public void swap(int x, int y){
+        int temp = heap[x];
+        heap[x] = heap[y];
+        heap[y] = temp;
+    }
+}
+
+// Create heap from arbitary array
+public void createMaxHeap(int[] a, int n) {
+    for(int i=N/2-2;i>=0;i--){
+        heapify(a,i);
+    }
+}
 
 ```
+
+References: [Digital Ocean](https://www.digitalocean.com/community/tutorials/min-heap-binary-tree)
 
 ## Disjoint Set Union
 https://amortizedminds.wordpress.com/2015/07/07/disjoint-set-union-data-structure/
@@ -338,6 +437,52 @@ https://amortizedminds.wordpress.com/2015/07/23/minimum-spaning-tree-kruskals-al
 
 https://amortizedminds.wordpress.com/2015/07/21/quick-sort-algorithm/
 
+### Quick Select - to Find kth highest value from Arr
+
+- The idea is to use QuickSort technique with random pivot and only sort required partition.
+- Complexity: $O(k)$
+
+```java
+class Solution {
+    public int findKthLargest(int[] arr, int k) {
+        int l = 0, r = arr.length - 1;
+        k = arr.length - k;
+        while (l < r) {
+            int partitionIndex = partition(arr, l, r);
+            if (partitionIndex == k)
+                return arr[k];
+            else if (partitionIndex < k)
+                l = 1 + partitionIndex;
+            else
+                r = partitionIndex - 1;
+            
+        }
+
+        return arr[k];
+    }
+
+    public int partition(int[] arr, int l,int r) {
+        int size = r-l+1;
+        int randIndex = new Random().nextInt(size) + l;
+        swap(arr, randIndex, l);
+        int L=l+1,R=r, pivot = arr[l];
+        while(L<R){
+            while(L<R && arr[L] <= pivot) L++;
+            while(L<R && arr[R] > pivot) R--;
+            swap(arr,L,R);
+        }
+        if(arr[L] > arr[l]) L--;
+        swap(arr,L,l);
+        return L;
+    }
+
+    public void swap(int a[], int l, int r){
+        int temp = a[l];
+        a[l]=a[r];
+        a[r]=temp;
+    }
+}
+```
 
 ### Merge Sort
 
