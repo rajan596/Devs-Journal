@@ -1,0 +1,55 @@
+System design interviews are typically 45 minutes excluding introduction and other related questions.
+
+If we are aware of specific step by step approach and ideal time we can spend on each section then interview can bring best out of your knowledge.
+
+Inspired by [Hello Interviw's](https://www.hellointerview.com/) framework listing down common sequencial approach.
+
+1. [System Requirements](#system-requirements)
+..
+
+# System Requirements
+
+## Functional Requirements
+
+## Non functional Requirements
+
+- See what Non functional requirement makes particular problem unique
+- Start with CAP theorem and decide on CP vs AP whats more important.
+
+# Back of the Envelop Estimations
+
+
+|Zeroes|Traffic|Storage|
+|--|--|--|
+|3|Thousand|KB|
+|6|Million|MB|
+|9|Billion|GB|
+|12|Trillian|TB|
+|15|--|PB|
+
+
+# Core Entities
+
+Mention core entities of system. Like for online Judge it would be
+1. user
+2. Problem
+3. Submission
+4. Leaderboard
+5. Competition
+
+# API or Interface
+
+- This will be user facing public APIs
+- It will solve our Functional requirements and Core Entity data flow
+- Mention REST APIs for each of the functional requirements
+
+# Data Flow (For Platform Design Questions)
+
+# High level design
+
+- Focus on Functional Requirements mentioned earlier as discussed with Interviewer
+- Just try to build a system that satisfies those functional requirements and try to avoid any distractions (distraction -> not part of Fn requirements)
+- 
+
+# Deep dive
+

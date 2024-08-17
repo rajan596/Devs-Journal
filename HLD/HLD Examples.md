@@ -1,3 +1,7 @@
+# Content Overview
+- [Top K Problem](#top-k-problem)
+- [Location Tracking](#location-tracking-system)
+- [Design LeetCode](#design-leetcode)
 
 # Top K Problem
 
@@ -40,6 +44,25 @@ References:
         - Overhead of TCP conn creation and termination
     - WebSocket: 
         - Bi-directional comm protocol
+
+# Design LeetCode
+
+Refer [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode) for complete solution. Here I will be writing important points for this Design
+
+#### Important Points
+- In this case user is submitting code which we need to execute. For this scenasio we can run code on our main servers. It needs **Isolated** execution to address Security concerns.
+- To address Isolation and Security couple of options are...
+    - To use VM: Problem with VM is they dont share host OS. Resource intensive and slow start up.
+    - Docket containers: Docket containers share host VM. So good option here. We can have multiple containers referring Java/python/etc run time
+    - AWS Lambda / Serverless Functions : Can also be an option but might suffer with cold start
+- If Leaderboard is in Requirement then efficiently and near realtime showing it is important design problem
+    - If just relies on SQL query -> Sloq query -> High DB load
+    - If we maintain cache with some TTL then DB load decrease -> Data staleness in API response
+    - **Redis Sorted Set** comes to the Rescue. If can have unique elements sorted by score.
+- WebSockets to display real time data might be over engineering for this use case. But can mention this solution exists but not relevant. For this case client side polling lets say every 3 Sec would work great.
+
+### References
+- [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)
 
 ### References:
 1. [Zoom System Design | System Design Video Application | System design of Zoom/Teams Application](https://www.youtube.com/watch?v=lrMon5qlHAg)

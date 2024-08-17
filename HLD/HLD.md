@@ -464,6 +464,37 @@ References:
   - Pulling out reports
   - Custom queries on data for analytics purpose
 
+# HyperLogLog
+
+- Use cases
+  - Unique visits of a web page
+  - Video unique views
+  - Reel unique views
+  - unique visits on the web page
+  - Determine the number of distinct people visiting Facebook in the past week using a single machine
+- It optimised memory consumption with the trade of accuracy
+- It does not store list of all visitors
+- **HyperLogLog is a probabilistic data structure that estimates the cardinality of a set.**
+- References
+  - [Redis Implementation of HyperLogLog](https://redis.io/docs/latest/develop/data-types/probabilistic/hyperloglogs/)
+- Redis Implementation
+  - Uses memory < 12 Kb
+  - Limitation: It can estimate cardinality upto 2^64 members
+
+```bash
+> PFADD bikes Hyperion Deimos Phoebe Quaoar
+(integer) 1
+> PFCOUNT bikes
+(integer) 4
+> PFADD commuter_bikes Salacia Mimas Quaoar
+(integer) 1
+> PFMERGE all_bikes bikes commuter_bikes
+OK
+> PFCOUNT all_bikes
+(integer) 6
+```
+
+# Bloom Filter
 
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**

@@ -271,8 +271,82 @@ public class Solution{
 ```
 
 ## Graph
+
+### BFS
+```java
+// int[][] grid
+class Solution {
+    public void doSomeStuff(Queue<int[]> q,int[][] grid,int[] node){}
+
+    public int orangesRotting(int[][] grid) {
+        Queue<int[]> q = new LinkedList<>(); // Create a Queue
+        int m=grid.length;
+        int n=grid[0].length;
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j] == 2) {
+                    q.add(new int[]{i,j}); // Add to queue. Initial nodes
+                }
+            }
+        }
+        int time=0;
+        while(!q.isEmpty()){
+            int size = q.size();        // Find size of existing nodes in Queue
+            for(int i=0;i<size;i++){    // Remove N nodes from queue
+                int[] node = q.remove();
+                doSomeStuff(q,grid,node); // Do processing and add next level nodes again in queue
+            }
+            if(q.size()>0) {
+                time++;
+            }
+        }
+        // ..... other code ....
+    }
+}
+
+```
+
+### DFS
+```java
+```
+
+### Cycle Check in Graph
+```java
+class UnDirectedGraphCycleDetectUsingDFS {
+    
+    public boolean dfsCheckCycle(int V, ArrayList<ArrayList<Integer>> adj,int node,int parent,boolean visited[]){
+        if(visited[node]) return true;
+        visited[node] = true; // If already visited -> means there is cycle
+        for(int adjNode: adj.get(node)){
+            if(adjNode!=parent && dfsCheckCycle(V,adj,adjNode,node,visited)) return true;
+        }
+        return false;
+    }
+    
+    // Function to detect cycle in an undirected graph.
+    public boolean isCycle(int V, ArrayList<ArrayList<Integer>> adj) {
+        // Code here
+        boolean visited[] = new boolean[V];
+        for(int i=0;i<V;i++){
+            if(!visited[i]) {
+                if(dfsCheckCycle(V,adj,i,i,visited)) return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
 - https://amortizedminds.wordpress.com/2015/06/30/djakstras-shortest-path-algorithm/
-- 
+
+### Disjoint Set Union
+https://amortizedminds.wordpress.com/2015/07/07/disjoint-set-union-data-structure/
+https://amortizedminds.wordpress.com/2015/08/01/detect-cycle-in-an-undirected-graph-using-disjoint-set-union/
+
+### Minimum spanning tree
+
+https://amortizedminds.wordpress.com/2015/07/23/minimum-spaning-tree-kruskals-algorithm/
+
 
 ## Bitwise operators
 
@@ -422,14 +496,6 @@ public void createMaxHeap(int[] a, int n) {
 ```
 
 References: [Digital Ocean](https://www.digitalocean.com/community/tutorials/min-heap-binary-tree)
-
-## Disjoint Set Union
-https://amortizedminds.wordpress.com/2015/07/07/disjoint-set-union-data-structure/
-https://amortizedminds.wordpress.com/2015/08/01/detect-cycle-in-an-undirected-graph-using-disjoint-set-union/
-
-## Minimum spanning tree
-
-https://amortizedminds.wordpress.com/2015/07/23/minimum-spaning-tree-kruskals-algorithm/
 
 ## Sorting Algorithms
 
