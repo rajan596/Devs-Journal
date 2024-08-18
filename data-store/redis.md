@@ -7,7 +7,12 @@
 
 - Used for caching data
 - In-memory data store i.e, stores data in RAM
-- It operates as a Single threaded 
+- It operates as a Single threaded process
+
+## Benefits
+- Simple sharding and replication strategy
+- Redis TTL auto expiry
+- Lua scripts for complex logic and atomic operations
 
 ## Redis as a Pub Sub
 

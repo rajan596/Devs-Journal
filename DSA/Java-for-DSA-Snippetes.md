@@ -353,6 +353,7 @@ https://amortizedminds.wordpress.com/2015/07/23/minimum-spaning-tree-kruskals-al
 ## Topological Sort
 
 ```java
+/**** USING BFS *****/
     public boolean canFinish(int numCourses, int[][] prerequisites) {
         Map<Integer, List<Integer>> graph = new HashMap<>();
         int inedge[] = new int[numCourses];
@@ -383,7 +384,50 @@ https://amortizedminds.wordpress.com/2015/07/23/minimum-spaning-tree-kruskals-al
         }
         return true;
     }
+
+/**** USING DFS *****/
+class TopologicalSortUsingDFS
+{
+    
+    static public void dfs(int node, Stack<Integer> st, boolean visited[], 
+        ArrayList<ArrayList<Integer>> adj
+    ){
+        if(visited[node]) return;
+        visited[node]=true;
+        for(int nbr: adj.get(node)) {
+            dfs(nbr,st,visited,adj);
+        }
+        st.push(node);
+    }
+    
+    //Function to return list containing vertices in Topological order. 
+    static int[] topoSort(int V, ArrayList<ArrayList<Integer>> adj) 
+    {
+        // add your code here
+        boolean visited[] = new boolean[V];
+        Stack<Integer> st = new Stack<>();
+        for(int i=0;i<V;i++){
+            if(!visited[i]) {
+                dfs(i,st,visited,adj);
+            }
+        }
+        int ans[]=new int[V];
+        int index=0;
+        while(!st.isEmpty()){
+            ans[index++]=st.pop();
+        }
+        return ans;
+    }
+}
+
 ```
+
+### Cycle detection in Directed graph
+- Using DFS: 
+    - Need to maintain pathVisited and overall visited checks.
+    - If path visited contains node we are traversing next that means there is cycle
+    - make sure to de mark node from pathVisited after going back from visited path.
+- Using BFS: Topological Sort - Indegree approach
 
 ## Heap
 - Complete binary tree

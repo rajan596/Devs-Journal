@@ -53,3 +53,6 @@ Mention core entities of system. Like for online Judge it would be
 
 # Deep dive
 
+# Other Resources
+- [Mastering Microsoft system design interview as software engineer
+](https://grokkingtechinterview.com/mastering-microsoft-system-design-interview-as-software-engineer-3089096f317e)
