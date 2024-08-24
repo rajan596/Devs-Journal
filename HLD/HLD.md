@@ -1,3 +1,12 @@
+# Important Terms
+
+|Term|Description|
+|-|-|
+|Reliability|aa|
+|Durability|aa|
+|Integrity|bb|
+|Fault tolerance|handle loss of any machine or data centre|
+
 # Short Notes
 
 - Fear of data loss from RAM, hard disk or machine failure. 
@@ -179,6 +188,34 @@ Use case for Document DB..
   - Quorum: configurable consistency when having multiple nodes
     - R + W > N --> To ensure strong consistency
     - R + W <= N --> Eventual consistency
+- Thundering Herd
+  - 
+
+# Polling techniques
+
+### Short Polling
+- Client requests server for new data at specific interval using simple HTTP request
+- If data is available server respnds with data otherwise gived 204 Content not available
+- Pros:
+  - Simple and faster to implement
+  - Useful when no realtime communication is required to client
+- Cons:
+  - More load on server because of periodic poll in the case when data is not available - Resource wastage
+  - Latency between data availability and data reaches to client
+- Alternatives: Long polling, WebSockets, Server sent Events
+- References: [Understanding Short Polling in Client-Server Communication](https://substack.com/@pushkarkumar/p-147993524)
+
+### Long Polling
+- Keeps connection open between client and server as long as possible
+- Server responds back when data is available. if data is not available server Holds requests and wait until data is available
+- More persistent connection than short polling. Data reaches to client immediately when available
+- Repeat new connection each time data is received or timeout has occurred
+- Pros
+  - Dont need complex infrastructure to implement
+  - Simple to implement
+- Cons
+  - Resource intensive as it holds all client requests
+  - Scalability issues
 
 # Vertical vs Horizontal Scaling
 - Vertical: Buying bigger machines
@@ -495,6 +532,43 @@ OK
 ```
 
 # Bloom Filter
+
+# Write Ahead Logs
+
+- Before we make changes to actual data file Log those changes in separate file in sync mode.
+- In case of crash WAL can be used to recover the data
+- Can reduce frequency of Disk writes
+- Point in time recovery is possible. Means we can re-create DB from files upto specific query or timestamp.
+- WAL maintains Log Sequence Number which is generally byte offset of the acrual data entry in WAL file
+
+# Gorilla DB
+- Its facebook's **In memory TSDB** - Time Series Database
+- Gorilla is an in-memory TSDB that functions as a **writethrough cache** for monitoring data written to an HBase data store.
+- AP System. Highly available for read/write but potentially drops few writes.
+- Data compression in memory using XOR techniques. It maps 16 bytes of data ot 1.37 bytes of data on average
+- TSDB is generally write dominance system
+- ACID properties not required
+- OpenTSDB
+  - Keeps older data as well with same accuracy
+  - Richer data model
+- ODS (Operational data store) HBase 
+  - Rolls up old data and aggregates it and have lower pricision for older data sets
+  - Roll up worth the storage space saved for trading accuracy
+- InfluxDB
+  - New open source time series DB with an even richer data model than OpenTSDB
+  - Keeps data on Disk -> leading to slower queries than if data is kept in memory
+- Reference
+  - [Facebook Gorilla DB](https://www.vldb.org/pvldb/vol8/p1816-teller.pdf)
+
+# Caching Strategies
+
+|Strategy|Details|
+|-|-|
+|Read through|..|
+|Read ahead|..|
+|Write through|First write in Cache, the in DB|
+|Write back|Data is updated in Cache and later updated in DB|
+
 
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**

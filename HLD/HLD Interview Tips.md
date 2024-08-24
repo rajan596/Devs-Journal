@@ -16,7 +16,7 @@ Inspired by [Hello Interviw's](https://www.hellointerview.com/) framework listin
 - See what Non functional requirement makes particular problem unique
 - Start with CAP theorem and decide on CP vs AP whats more important.
 
-# Back of the Envelop Estimations
+## Back of the Envelop Estimations
 
 
 |Zeroes|Traffic|Storage|
@@ -28,7 +28,7 @@ Inspired by [Hello Interviw's](https://www.hellointerview.com/) framework listin
 |15|--|PB|
 
 
-# Core Entities
+## Core Entities
 
 Mention core entities of system. Like for online Judge it would be
 1. user
@@ -37,21 +37,27 @@ Mention core entities of system. Like for online Judge it would be
 4. Leaderboard
 5. Competition
 
-# API or Interface
+## API or Interface
 
 - This will be user facing public APIs
 - It will solve our Functional requirements and Core Entity data flow
 - Mention REST APIs for each of the functional requirements
 
-# Data Flow (For Platform Design Questions)
+## Data Flow (For Platform Design Questions)
 
-# High level design
+## High level design
 
 - Focus on Functional Requirements mentioned earlier as discussed with Interviewer
 - Just try to build a system that satisfies those functional requirements and try to avoid any distractions (distraction -> not part of Fn requirements)
 - 
 
-# Deep dive
+## Deep dive
+
+## Other Resources
+
+# InterviewReady Guide
+
+![alt text](./assets/interviewready-matrix.png)
 
 # Other Resources
 - [Mastering Microsoft system design interview as software engineer

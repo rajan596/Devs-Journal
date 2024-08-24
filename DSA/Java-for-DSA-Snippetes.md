@@ -337,6 +337,130 @@ class UnDirectedGraphCycleDetectUsingDFS {
 }
 ```
 
+### Cycle detection in Directed graph
+- Using DFS: 
+    - Need to maintain pathVisited and overall visited checks.
+    - If path visited contains node we are traversing next that means there is cycle
+    - make sure to de mark node from pathVisited after going back from visited path.
+- Using BFS: Topological Sort - Indegree approach
+
+### Shortest Path Algorithms
+
+#### Weighed Undirected Graph | Dijkstra | PriorityQueue
+
+- This will not work for -ve edge graphs.
+- useful to find shortest distance from src node to all other nodes in graph.
+- Algorithm:
+    - Start with 
+- Complexities
+    - Time: $O(E*log(V))$
+    - Space: $O(E)$
+
+```java
+class DijsktaUsingPQ
+{
+    //Function to find the shortest distance of all the vertices
+    //from the source vertex S.
+    static int[] dijkstra(int V, ArrayList<ArrayList<ArrayList<Integer>>> adj, int S)
+    {
+        // Write your code here
+        PriorityQueue<Pair> pq = new PriorityQueue<>((x,y)->x.dist-y.dist);
+        pq.add(new Pair(0,S));
+        int dist[]= new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[S]=0;
+        
+        while(!pq.isEmpty()){
+            Pair top = pq.peek();
+            pq.remove();
+            int node = top.node;
+            int distance = top.dist;
+            
+            for(ArrayList<Integer> nbr: adj.get(node)){
+                int nbrNode = nbr.get(0);
+                int nbrEdgeWt = nbr.get(1);
+                int newDist = distance +nbrEdgeWt;
+                if(newDist < dist[nbrNode]) {
+                    dist[nbrNode]=newDist;
+                    pq.add(new Pair(newDist, nbrNode));
+                }
+            }
+        }
+        return dist;
+    }
+}
+```
+
+#### Shortest path in Directed Acyclic graph - DAG
+
+**Algorithm**
+- Do topological sort and get the sequence
+- Start with initial node... Go neighbour dist[nbr] = min(dist[nbr],dist[node] + W(node,nbr))
+- Intuition: If we are at Node $node$ and we are able to find shortest path for all nodes which will come before $node$ then we can safely say that $node$'s shortest path will be shortest path for all its preceeding node + dist between preceeding node and current node 
+- This will not work for Cyclic graph
+
+```java
+class ShortestPathUsingTopoSortDAG {
+
+	public int[] shortestPath(int N,int M, int[][] edges) {
+		//Code here
+		List<List<int[]>> graph = new ArrayList<>();
+		int[] ans = new int[N];
+		Arrays.fill(ans, Integer.MAX_VALUE);
+		int[] indegree = new int[N];
+		
+		// build graph
+		for(int i=0;i<N;i++) {
+		    graph.add(new ArrayList<>());
+		}
+		for(int i=0;i<M;i++){
+		    int from = edges[i][0];
+		    int to = edges[i][1];
+		    int dist = edges[i][2];
+		    graph.get(from).add(new int[]{to, dist});
+		    indegree[to]++;
+		}
+		// Do topo Sort
+		List<Integer> topoSortList = new ArrayList<>();
+		Queue<Integer> q = new LinkedList<>();
+		for(int i=0;i<N;i++){
+		    if(indegree[i]==0) {
+		        q.add(i);
+		    }
+		}
+		while(!q.isEmpty()){
+		    int no = q.peek();
+		    q.remove();
+		    topoSortList.add(no);
+		       
+		    for(int[] nbr: graph.get(no)){
+		        int nbrnode= nbr[0];
+		        indegree[nbrnode]--;
+		        if(indegree[nbrnode]==0) {
+		            q.add(nbrnode);
+		        }
+		    }
+		}
+		
+		// Algorithm to calculate shortest path
+		ans[0]=0;
+		for(int i=0;i<N;i++){
+		    int no = topoSortList.get(i);
+		    int dist = ans[no];
+		    for(int[] nbr: graph.get(no)){
+		        int nbrnode = nbr[0];
+		        if(dist != Integer.MAX_VALUE) // If this node is reachable then only update nbr node dist
+		            ans[nbrnode] = Math.min(ans[nbrnode], dist + nbr[1]);
+		    }
+		    if(dist==Integer.MAX_VALUE) {
+		        ans[no]=-1;
+		    }
+		}
+		return ans;
+	}
+}
+```
+
 - https://amortizedminds.wordpress.com/2015/06/30/djakstras-shortest-path-algorithm/
 
 ### Disjoint Set Union
@@ -347,8 +471,6 @@ https://amortizedminds.wordpress.com/2015/08/01/detect-cycle-in-an-undirected-gr
 
 https://amortizedminds.wordpress.com/2015/07/23/minimum-spaning-tree-kruskals-algorithm/
 
-
-## Bitwise operators
 
 ## Topological Sort
 
@@ -421,13 +543,6 @@ class TopologicalSortUsingDFS
 }
 
 ```
-
-### Cycle detection in Directed graph
-- Using DFS: 
-    - Need to maintain pathVisited and overall visited checks.
-    - If path visited contains node we are traversing next that means there is cycle
-    - make sure to de mark node from pathVisited after going back from visited path.
-- Using BFS: Topological Sort - Indegree approach
 
 ## Heap
 - Complete binary tree

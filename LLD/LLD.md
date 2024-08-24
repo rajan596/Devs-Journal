@@ -194,6 +194,53 @@ These patterns explain how to assemble objects and classes into larger structure
 
 ### Adapter Design pattern
 
+- Adapter is a structural design pattern that allows objects with **incompatible interfaces to collaborate.**
+- Acts as a bridge between 2 incompatible interfaces
+- Main components in this pattern
+    - Target Interface: Client will use this interface
+    - Adaptee: Incompatible interface brobably external library
+    - Adapter: WHo translates Target to Adaptee interface
+    - Client: Who uses target Interface
+- Pros
+    - Single Responsibility: Business logic is different from Data conversion logic
+    - Open close Principlal: Introduce new type of adapter without breaking existing client code
+- Cons
+    - Additional complexity to introduce adapter
+- Similarity with other pattens
+    - Facade defines a new interface for existing objects, whereas Adapter tries to make the existing interface usable.
+    - With Adapter you access an existing object via different interface. With Proxy, the interface stays the same. 
+- References: [Refactor Guru](https://refactoring.guru/design-patterns/adapter)
+
+```java
+interface Analytics { // Target interface
+    public void post(JsonObject message);
+}
+
+interface ExternalAnalyticsSDK{ // Adaptee - External Lib interface
+    public void sendAnalyticsMatrix(AnalyticsMatrix matrix);
+}
+
+class AnalyticsAdapter implements Analytics{
+    ExternalAnalyticsSDK externalAnalyticsSDK;
+
+    @override
+    public void post(JsonObject message){
+        // Converts JsonObject -> AnalyticsMatrix
+        AnalyticsMatrix matrix = AnalyticsMatrixBuilder.data(message.getString("params")).build();
+        // Calls appropreate method of Adaptee
+        externalAnalyticsSDK.sendAnalyticsMatrix(matrix);
+    }
+}
+
+class MyApplication {
+    Analytics analyticsLib = new AnalyticsAdapter();
+    JsonObject jsonMessageObject = new JsonObject();
+    jsonMessageObject.put("data",["weight",12]);
+    analyticsLib.post(jsonMessageObject);
+}
+
+```
+
 ### Bridge Design Pattern
 
 - Similar to Strategy design pattern
@@ -235,7 +282,9 @@ References:
 
 ### Facade Design Pattern
 
+
 ### Flyweight Design Pattern
+
 
 ### Proxy pattern:
 - Useful to wrap out main method from client and put explicit sanity checks/ validations
