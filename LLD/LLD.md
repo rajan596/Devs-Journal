@@ -299,10 +299,116 @@ class Directory implements FileSystem{
 ```
 
 ### Facade Design Pattern
+- Facade is a structural design pattern that provides a **simplified** interface to a library, a framework, or any other complex set of classes.
+- Simple, Widely used. CA can be our facade for filing complex Income tax
+- When to use ? **When we have to hide the System complexity from the client.**
+- Facade maked client's life easier so Facade usage is not forced to client and client can opt-it as per convinience
+- Client can directly use System functionalities rather than going via Facade
+- Facade vs Proxy
+    - Proxy has the same interface while facade do not have same interface rather it talks to many diff complex service objcts
+- Facade vs Adapter
+    - Facade defines a new interface for existing objects, whereas Adapter tries to make the existing interface usable. Adapter usually wraps just one object, while Facade works with an entire subsystem of objects.
+- Flyweight shows how to make lots of little objects, whereas Facade shows how to make a single object that represents an entire subsystem.
+- References: [Refactor Guru](https://refactoring.guru/design-patterns/facade)
 
+```java
+class PaymentService(){}
+class InventoryService(){}
+class NotificationService(){}
+class CacheService {}
+
+class OrderFacade {
+    PaymentService paymentService;
+    InventoryService inventoryService;
+    NotificationService notificationService;
+    CacheService cacheService;
+
+    // Method which simplifies underlying system interactions
+    public void placeorder(String productId) {
+        Product product;
+        if(cacheService.get(productId)) {
+            product = cacheService.get(productId);
+        } else {
+            inventoryService.updateInventory();
+        }
+        paymentService.doPayment();
+        cacheService.invalidate(productId);
+        notificationService.sendNotification();
+    }
+}
+class ClientApplication{
+    OrderFacade orderFacade = new OrderFacade();
+    orderFacade.placeOrder("umbrella");
+}
+```
 
 ### Flyweight Design Pattern
+- **Cache**
+- As name suggests it reduces memory footprint of RAM
+- It lets you fit more objects into the available amount of RAM by **sharing common parts of state** between multiple objects instead of keeping all of the data in each object.
+- Situation: 
+    - Lets say we have forest and forest can have multiple Trees.
+    - There can be multiple trees of same type with different coordinates x and y
+    - Example
+        - Tree1: x=10.56,y=5.9,     Color=Green,name=Mango
+        - Tree2: x=56.56,y=55.9,    Color=Green,name=Mango
+        - Tree3: x=23.56,y=75.9,    Color=Green,name=Mango
+        - Tree4: x=10.56,y=5.9,     Color=Green,name=Banana
+        - Tree5: x=10.56,y=5.9,     Color=Green,name=Banana
+    - Now as we can see Mango tree name ans Color is stores across many objects which means same state is shared across many objects.
+    - This results in higher memory footprints if 1000s of such objects are created with memory intensive state details
+- Solution
+    - We can extract out common state details in Separate entity and can link with Tree.
+    - We can define TreeType entity which will have { Color, name }
+    - Now Tree can have associated TreeType with it.
+    - TreeType can be independently created and shared among different tree objects
+    - TreeType object needs to be immutable.
+-  Use the Flyweight pattern only when your program must support a huge number of objects which barely fit into available RAM.
+- Flyweight shows **how to make lots of little objects**, whereas Facade shows how to make a single object that represents an entire subsystem.
+- References: [Design Guru](https://refactoring.guru/design-patterns/flyweight)
 
+```java
+class Forest {
+    List<Tree> trees;
+
+    public void plantTree(long lang,long lat,String treeName){
+        Tree tree1 = new Tree(1,2,TreeTypeFactory.getTreeTypeObj("mango"));
+
+        // Do further processing...
+    }
+}
+
+class Tree {
+    long lang,lat;
+    TreeType treetype;
+
+    public Tree(long lang,long lat, TreeType treetype){
+        this.lang=lang;
+        this.lat=lat;
+        this.treeType=treeType;
+    }
+}
+
+// We can have a factory which creates and maintains unique TreeType objects
+class TreeTypeFactory {
+    Map<String, TreeType> treeTypeObjectsMap = new HashMap<>();
+    public getTreeTypeObj(String name){
+        if(treeTypeObjectsMap.containsKey(name)) {
+            return treeTypeObjectsMap.get(name);
+        }
+        TreeType treeType = new TreeType(name);
+        treeTypeObjectsMap.put(name, treeType);
+        return treeType;
+    }
+}
+
+// Only one instance will be created for each TreeType..
+class TreeType {
+    String name;
+    String color;
+}
+
+```
 
 ### Proxy pattern:
 - Useful to wrap out main method from client and put explicit sanity checks/ validations
