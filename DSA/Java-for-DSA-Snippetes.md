@@ -461,7 +461,105 @@ class ShortestPathUsingTopoSortDAG {
 }
 ```
 
-- https://amortizedminds.wordpress.com/2015/06/30/djakstras-shortest-path-algorithm/
+### Bellman-Ford Algorithm
+- Dijkstra fails when negative edge or negative cycle is there
+- Works with directed graph. So change undirected graph -> directed graph
+- Finds shortest path from src to all other nodes
+- Algorithm
+    - Relax edges V-1 times
+    - itrate all edges V-1 times
+    - If dist[v] > dist[u] + wt then update distance of v
+- Why V-1 times relaxation is required ?
+    - In worst case in single iteration only 1 step shortest distance will be calculated
+    - In best case in a single iteration only shortest distance till dest node will be calculated
+    - This depends on how edges are iterated or given in input
+- How to detect negative cycle ?
+    - If on V'th iteration still esge gets relaxed that means its having cycle.
+
+```java
+/*
+*   edges: vector of vectors which represents the graph
+*   S: source vertex to start traversing graph with
+*   V: number of vertices
+*/
+class Solution {
+    static int[] bellman_ford(int V, ArrayList<ArrayList<Integer>> edges, int S) {
+        int dist[]=new int[V];
+        Arrays.fill(dist,(int)1e8);
+        dist[S]=0;
+        for(int i=0;i<V-1;i++){ // Relax edges V-1 times
+            for(ArrayList<Integer> edge: edges){
+                int u=edge.get(0);
+                int v=edge.get(1);
+                int wt=edge.get(2);
+                if(dist[u]!=1e8 && dist[v] > dist[u] + wt){
+                    dist[v]=dist[u] + wt;
+                }
+            }
+        }
+        // If the graph contains negative cycle then V'th iteration will give even shorter distance
+        for(ArrayList<Integer> edge: edges){
+            int u=edge.get(0);
+            int v=edge.get(1);
+            int wt=edge.get(2);
+            if(dist[u]!=1e8 && dist[v] > dist[u] + wt){
+                return new int[]{-1};
+            }
+        }
+        return dist;
+    }
+}
+```
+
+### Floyd Warshall Algorithm
+
+- Multi source shortest path algorithm
+- Finds shortest distance from all nodes to all other nodes
+- Algorithm
+    - Fix via from 0 to N-1
+    - Select each distinct u and v and go $via$ i.e, dist[u][v]=Math.min(dist[u][v], dist[u][via] + dist[via][v]);
+- Can also detect negative cycle
+- Complexity: $O(V^3)$
+
+```java
+class FloydWarshallShortestPath
+{
+    public void shortest_distance(int[][] matrix)
+    {
+        int n=matrix.length;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]==-1) {
+                    matrix[i][j] = (int)1e9;
+                }
+                if(i==j) matrix[i][j]=0;
+            }
+        }
+        
+        for(int via=0;via<n;via++){
+            for(int i=0;i<n;i++){
+                for(int j=0;j<n;j++){
+                    matrix[i][j]=Math.min(matrix[i][j], matrix[i][via] + matrix[via][j]);
+                }
+            }
+        }
+        
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]==1e9) {
+                    matrix[i][j] = -1;
+                }
+            }
+        }
+
+        for(int i=0;i<n;i++){
+            if(i==j && matrix[i][i] < 0) {
+                System.out.printl("Cycle detected...");
+            }
+        }
+    }
+}
+```
 
 ### Disjoint Set Union
 https://amortizedminds.wordpress.com/2015/07/07/disjoint-set-union-data-structure/

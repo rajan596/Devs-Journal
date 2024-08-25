@@ -11,8 +11,8 @@
     * Structural Patterns : How more than one class/objects are structured
         1. [Adaptor](#adapter-design-pattern)
         2. [Bridge](#bridge-design-pattern)
-        3. [Composite](#composite)
-        4. [Decorator](#composite-design-pattern)
+        3. [Composite](#composite-design-pattern)
+        4. [Decorator](#decorator-pattern)
         5. [facade](#facade-design-pattern) **TODO**
         6. [Flyweight](#flyweight-design-pattern)
         7. [Proxy](#proxy-pattern)
@@ -272,12 +272,30 @@ References:
 - [Refactoring Guru](https://refactoring.guru/design-patterns/bridge)
 
 ### Composite Design Pattern
-- ** Object Inside Object **
+- **Object Inside Object**
 - Like File System, Employee Hierarchy or Tree Like structure Composite pattern can be used.
-- Problem: 
+
+![alt text](./assets/images/composite-pattern-uml.jpeg)
 
 ```java
+interface FileSystem {
+    public void ls();
+}
+class File implements FileSystem{
+    @override
+    public void ls(){}
+}
+class Directory implements FileSystem{
+    String directory;
+    List<FileSystem> list;
 
+    @override
+    public void ls(){
+        for(FileSystem obj: list){
+            obj.ls();
+        }
+    }
+}
 ```
 
 ### Facade Design Pattern
