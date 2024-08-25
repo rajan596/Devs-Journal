@@ -73,7 +73,7 @@ https://en.wikipedia.org/wiki/Single-responsibility_principle
 ## Creational Patterns
 Provides **object creation** patterns.
 
-### Factory pattern
+## Factory pattern
 - A factory pattern is a creational pattern. 
 Put another way, a factory pattern is used to create objects of a specific type. 
 A strategy pattern is use to perform an operation (or set of operations) in a particular manner
@@ -87,7 +87,7 @@ A strategy pattern is use to perform an operation (or set of operations) in a pa
 
 - this helps with the principle: *"Identify the aspects that vary and separate them from what stays the same"*
 
-### Abstract Factory pattern 
+## Abstract Factory pattern 
 - Factory of factory : One factory initializes another factory.
 - For Country, Pizza: First factory gets country specific object and the country specific object then gets concrete pizzas.
 - Encapsulated object creation
@@ -121,17 +121,17 @@ class Client {
 
 ```
 
-### Builder pattern
+## Builder pattern
 If you find yourself in a situation where you keep on adding new parameters to a constructor, resulting in code that becomes error-prone and hard to read, perhaps it's a good time to take a step back and consider refactoring your code to use a Builder.
 
-### Prototype design pattern
+## Prototype design pattern
 In the prototype pattern, cloning is delegated to the actual objects being cloned.
 Basically concrete class implements Cloneable interface and overrides clone method.
 Clients need not worry when references object using interface/abstract class which actual object being copied. 
 
-### Singleton design pattern
+## Singleton design pattern
 
-### Object Pool Pattern
+## Object Pool Pattern
 
 - Used to manage reusable pool of object
 - Philosophy: Pick object from pool, use, again return it to pool
@@ -192,7 +192,7 @@ Disadvantages:
 ## Structural Patterns
 These patterns explain how to assemble objects and classes into larger structures while keeping these structures flexible and efficient.
 
-### Adapter Design pattern
+## Adapter Design pattern
 
 - Adapter is a structural design pattern that allows objects with **incompatible interfaces to collaborate.**
 - Acts as a bridge between 2 incompatible interfaces
@@ -241,7 +241,7 @@ class MyApplication {
 
 ```
 
-### Bridge Design Pattern
+## Bridge Design Pattern
 
 - Similar to Strategy design pattern
 - Difference
@@ -271,7 +271,7 @@ class BlueColor { doColor(){} }
 References:
 - [Refactoring Guru](https://refactoring.guru/design-patterns/bridge)
 
-### Composite Design Pattern
+## Composite Design Pattern
 - **Object Inside Object**
 - Like File System, Employee Hierarchy or Tree Like structure Composite pattern can be used.
 
@@ -298,7 +298,7 @@ class Directory implements FileSystem{
 }
 ```
 
-### Facade Design Pattern
+## Facade Design Pattern
 - Facade is a structural design pattern that provides a **simplified** interface to a library, a framework, or any other complex set of classes.
 - Simple, Widely used. CA can be our facade for filing complex Income tax
 - When to use ? **When we have to hide the System complexity from the client.**
@@ -342,7 +342,7 @@ class ClientApplication{
 }
 ```
 
-### Flyweight Design Pattern
+## Flyweight Design Pattern
 - **Cache**
 - As name suggests it reduces memory footprint of RAM
 - It lets you fit more objects into the available amount of RAM by **sharing common parts of state** between multiple objects instead of keeping all of the data in each object.
@@ -410,7 +410,7 @@ class TreeType {
 
 ```
 
-### Proxy pattern:
+## Proxy pattern:
 - Useful to wrap out main method from client and put explicit sanity checks/ validations
 - This is used in a daily practice.
 - Concept: Request to real object will go via proxy layer
@@ -491,7 +491,7 @@ class Client {
 ## Behavioral patterns
 These patterns are concerned with algorithms and the assignment of responsibilities between objects.
 
-### Chain of Responsibility
+## Chain of Responsibility
 
 ![Alt Text](./assets/images/chain_of_responsibility.png)
 
@@ -511,16 +511,16 @@ These patterns are concerned with algorithms and the assignment of responsibilit
 - https://www.geeksforgeeks.org/chain-responsibility-design-pattern/
 - https://refactoring.guru/design-patterns/chain-of-responsibility
 
-### Command Design Pattern
+## Command Design Pattern
 TODO
 
 
-### Iterator Design Pattern
+## Iterator Design Pattern
 TODO
 
-### Mediator Design Pattern
+## Mediator Design Pattern
 
-### Memento Design Pattern
+## Memento Design Pattern
 
 - Useful when object state needs to be maintained to support Undo Functionality or restore at specific snapshot version. **Maintain History**
 - It does not expose internal implementation
@@ -563,7 +563,7 @@ classDiagram
     }
 ```
 
-### Interpreter
+## Interpreter
 
 - Interpret expression using a Context
 - It has
@@ -576,7 +576,7 @@ classDiagram
 [TBD]
 ```
 
-### Mediator Pattern
+## Mediator Pattern
 
 - Different objects communicate through **Mediator** allowing loose coupling
 
@@ -629,7 +629,7 @@ class Auction implements AuctionMediator {
 
 ```
 
-### Strategy Pattern
+## Strategy Pattern
 Deciding behavior class based on strategy.
 A strategy pattern is an **behavoral pattern**.
 Definition as per Head First
@@ -686,7 +686,7 @@ class FileUploadStrategies {
 
 ```
 
-### Template pattern
+## Template pattern
 
 When to use ?
 - This is behaviral pattern
@@ -722,9 +722,9 @@ class Cashpayment extends PaymentTemplateClass{
 }
 ```
 
-### Visitor Design pattern
+## Visitor Design pattern
 
-### Observer Pattern
+## Observer Pattern
 One data source object notifies all observers regarding data change. Observers can be added and removed at any time.
 This is one of the most heavily used pattern in JDK. \
 This pattern a very good example of loosely coupled objects.
@@ -798,7 +798,7 @@ class HelperClass {
 
 ```
 
-### Decorator Pattern
+## Decorator Pattern
 - Attaches additional responsibility to object at run time.
 - Allows us to add some behaviour at run time without re-compiling.
 - Follows Open-close principle
