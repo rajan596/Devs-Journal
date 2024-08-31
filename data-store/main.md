@@ -118,6 +118,8 @@ Isolation: How 2 parallel transaction can affect each other. 2 Transactions are 
 ## Data Storage & Retrievals (DDIA Notes)
 
 
+## PostgreSQL vs MySQL (TODO)
+
 ## Databases
 
 1) MySQL
@@ -137,6 +139,14 @@ Isolation: How 2 parallel transaction can affect each other. 2 Transactions are 
 5) ScyllaDB
 - #NoSQL #ACID
 - Cassandra compatible DB written in C++
+
+# Notes
+
+- **Partital Indexes** : [YT: Partitial Index](https://www.youtube.com/watch?v=CA2_0ZhVW2g)
+    - If we have millions of rows and we want to get data for specific constraints like count >= 100 then we can create index based on this criteria
+    - This will not index all DB rows but partial rows meeting criteria for count > 100
+    - This is called partitial indexing and is supported in PostgreSQL
+    - It increased query performanc drastically if there is very less data meeting contraint 1 to 10% data
 
 # Database Internal Notes ([Educosys Playlist](https://www.youtube.com/watch?v=8ogJlOIxKVE))
 

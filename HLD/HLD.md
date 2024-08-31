@@ -217,6 +217,29 @@ Use case for Document DB..
   - Resource intensive as it holds all client requests
   - Scalability issues
 
+## Web Sockets
+- Not based on HTTP
+
+## Server Sent Events
+- Based on HTTP
+- Modern browser supports for SSE
+- In this persistent connection establishes and only server can send event to client
+- References
+  - [Medium Article](https://medium.com/deliveryherotechhub/what-is-server-sent-events-sse-and-how-to-implement-it-904938bffd73)
+
+```bash
+GET /api/v1/live-scores   <-- simple GET request
+Accept: text/event-stream <-- Indicates a stream
+Cache-Control: no-cache.  <-- disable caching
+Connection: keep-alive.   <-- Persisitent connecton
+
+Response:
+id: 1
+event: score
+data: GOAL Liverpool 1 - 1 Arsenal
+data: GOAL Manchester United 3 - 3 Manchester City
+```
+
 # Vertical vs Horizontal Scaling
 - Vertical: Buying bigger machines
 - Horizontal: Buying more machines
@@ -568,7 +591,6 @@ OK
 |Read ahead|..|
 |Write through|First write in Cache, the in DB|
 |Write back|Data is updated in Cache and later updated in DB|
-
 
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**

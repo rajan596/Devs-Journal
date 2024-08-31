@@ -2,7 +2,7 @@ System design interviews are typically 45 minutes excluding introduction and oth
 
 If we are aware of specific step by step approach and ideal time we can spend on each section then interview can bring best out of your knowledge.
 
-Inspired by [Hello Interviw's](https://www.hellointerview.com/) framework listing down common sequencial approach.
+Inspired by [Hello Interview's](https://www.hellointerview.com/) framework listing down common sequencial approach.
 
 1. [System Requirements](#system-requirements)
 ..
@@ -10,14 +10,19 @@ Inspired by [Hello Interviw's](https://www.hellointerview.com/) framework listin
 # System Requirements
 
 ## Functional Requirements
+- Features of the system
+- It should start with **User should be able to..**
 
 ## Non functional Requirements
 
-- See what Non functional requirement makes particular problem unique
+- See what Non functional requirement makes particular **problem unique**
 - Start with CAP theorem and decide on CP vs AP whats more important.
+- Check R:W Ratio
 
 ## Back of the Envelop Estimations
-
+- Do only if required.
+- Can ask interviewer if this is required. This consumes time and might not be meaningful all the time.
+- Can do if result of calculation has direct influence on design  
 
 |Zeroes|Traffic|Storage|
 |--|--|--|
@@ -27,9 +32,9 @@ Inspired by [Hello Interviw's](https://www.hellointerview.com/) framework listin
 |12|Trillian|TB|
 |15|--|PB|
 
-
 ## Core Entities
 
+- It helps to get understanding of what data will be persisited in system and exchanged by the APIs.
 Mention core entities of system. Like for online Judge it would be
 1. user
 2. Problem

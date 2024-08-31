@@ -28,6 +28,27 @@ List<Integer> arr = new ArrayList();
 Collections.sort(arr);
 ```
 
+### Binary Search in Array
+```java
+public class BinarySearchUsingLib {
+    public static void main(String[] args) {
+
+        /**
+         *
+         index of the search key, if it is contained in the array; otherwise, (-(insertion point) - 1).
+         The insertion point is defined as the point at which the key would be inserted into the array:
+         the index of the first element greater than the key,
+         * */
+
+        System.out.println(">> " + Arrays.binarySearch(new int[]{1,100,200,500},1));        // 0
+        System.out.println(">> " + Arrays.binarySearch(new int[]{1,100,200,500},100));      // 1
+        System.out.println(">> " + Arrays.binarySearch(new int[]{1,100,200,500},150));      // -3
+        System.out.println(">> " + Arrays.binarySearch(new int[]{1,100,200,500},600));      // -5
+    }
+}
+
+```
+
 ## String operations in Java
 ```java
 String s = new Strng();
@@ -68,10 +89,22 @@ PriorityQueue<Node> pq = new PriorityQueue<>((left,right)-> left.f-right.f);
 LinkedList<int[]> result = new LinkedList<>();
 result.add(new int[] {1, 2});
 result.toArray(new int[result.size()][]);
+```
+
+## Double ended queue in Java
+
+```java
+Deque<String> deque = new ArrayDeque<>();
+deque.addFirst(1); // adds to the head side of queue
+deque.addLast(2);  // adds to the tail side of queue
+
+int first = deque.removeFirst();
+int last = deque.removeLast();
 
 
 ```
-## Map
+
+## Map in Java
 
 ```java
 Map<Integer, Integer> mp = new HashMap<>();
@@ -83,6 +116,62 @@ for (Map.Entry<String,String> entry : mp.entrySet())  {} // Iterator
 for (Integer key : gfg.keySet()) {}   // iterate over keys
 for (Integer value : mp.values()){ } // iterate over values
 
+```
+
+## TreeMap in Java
+- Implemented using self balanced Red black tree
+- log(N) operations for add/remove/get
+
+```java
+
+```
+
+## Set in Java
+
+### TreeSet
+- Implementation of self balanced Binary search tree - Red black Tree
+- Add/Delete/Remove -> O(LogN)
+- Set <--(Extends)--- SortedSet <--(Extends)--- TreeSet
+
+```java
+public class TreeSetExample {
+    public static void main(String[] args) {
+        TreeSet<Integer> ts = new TreeSet<>();
+        ts.add(100);
+        ts.add(350);
+        ts.add(10);
+
+        // Finds element <= given element
+        System.out.println(ts.lower(80)); // 10
+        System.out.println(ts.lower(500)); // 350
+        System.out.println(ts.lower(350)); // 100
+
+        // Finds element > given element
+        System.out.println(ts.higher(6)); // 10
+        System.out.println(ts.higher(10)); // 100
+        System.out.println(ts.higher(200)); // 350
+        System.out.println(ts.higher(350)); // null
+        System.out.println(ts.higher(500)); // null
+
+        // Removed the element from Set
+        ts.remove(100);
+        ts.pollFirst(); // Removes the first element
+        ts.pollLast(); // Removes the last element
+
+        ts.add(19);
+
+        for(Integer value: ts) {
+            System.out.println("--> " + value);
+        }
+
+        TreeSet<Integer> ts2 = new TreeSet<>((l,r)->r-l);
+        ts2.add(100);
+        ts2.add(200);
+        for(Integer value: ts2) {
+            System.out.println("-->> " + value); // Prints 200,100
+        }
+    }
+}
 ```
 
 ## Stack in Java
@@ -561,14 +650,178 @@ class FloydWarshallShortestPath
 }
 ```
 
-### Disjoint Set Union
+### Disjoint Set Union [IMP]
+- Can answer queries like Does x and y part of the same component/set/graph segment
+- Maintain leader node in each segment using size / height.
+- Rank can not be reduced
+- Time Complexity: 
+    - Union: $O(4*alpha)$ ~ $O(1)$
+    - findParent:
+
+```java
+class DisjointSetUnion {
+    int[] parent;
+    int[] rank;
+    int[] size;
+
+    public DisjointSetUnion(int _size){
+        parent = new int[_size+1];
+        rank = new int[_size+1];
+        size = new int[_size+1];
+        for(int i=0;i<=_size;i++) {
+            parent[i]=i;
+        }
+    }
+
+    public int findParent(int node){
+        int leader = node;
+        while(parent[leader] != leader){
+            leader = parent[leader];
+        }
+        while(parent[node] != node){
+            node = parent[node];
+            parent[node]=leader; // this is leader node for this segment
+        }
+        return leader;
+    }
+
+    public boolean isSameComponent(int x,int y){
+        return findParent(x) == findParent(y);
+    }
+
+    /* rank is distoreted in this approach */
+    public void unionByRank(int x,int y){
+        int xParent = findParent(x);
+        int yParent = findParent(y);
+
+        if(xParent == yParent) return;
+
+        int xRank = rank[xParent];
+        int yRank = rank[yParent];
+
+        if(xRank >= yRank) {
+            parent[yParent] = xParent; // Path compression
+            rank[xParent]=Math.max(rank[xParent],1+rank[yParent]); // Rank by height
+        } else {
+            parent[xParent] = yParent;
+            rank[yParent]=Math.max(rank[xParent],1+rank[yParent]); // Rank by height
+        }
+    }
+
+    // This is union by size
+    public void union(int x,int y){
+        int xParent = findParent(x);
+        int yParent = findParent(y);
+
+        if(xParent == yParent) return;
+        int xSize = size[xParent];
+        int ySize = size[yParent];
+        if(xSize >= ySize) {
+            parent[yParent] = xParent;    // Path compression
+            size[xParent]+=size[yParent]; // Rank by size
+        } else {
+            parent[xParent] = yParent;
+            size[yParent]+=size[xParent]; // Rank by size
+        }
+    }
+}
+```
+
 https://amortizedminds.wordpress.com/2015/07/07/disjoint-set-union-data-structure/
 https://amortizedminds.wordpress.com/2015/08/01/detect-cycle-in-an-undirected-graph-using-disjoint-set-union/
 
 ### Minimum spanning tree
+- Undirected Weighted graph 
+- MST: Tree in which we have N nodes and N-1 edges & all nodes are reachable to each other
+
+#### Prim's Algorithm
+- start with any given node
+- add start node in Min PQ along with weight
+- Remove top element each time and mark it as visited. 
+    - Add adjacent elements {adj, weight}
+- Repeat until PQ is not empty
+- Intuition: In this approach there are two sets of vertices. one that is in growing spanning tree and the rest. The approach is simple. Just add cheapest vertices in growing spanning tree. and meanwhile check if there is cycle or not. Starting vertices can be chosen randomly. Maintain cheapest vertices data in Priority Queue.
+- Time Complexity: O(E log(E))
+
+```java
+class PrimsAlgorithmMST {
+    static int spanningTree(int V, int E, List<List<int[]>> adj) {
+        // Code Here.
+        int visited[] = new int[V];
+        int ans=0;
+        PriorityQueue<Node> pq = new PriorityQueue<>((l,r)->l.w-r.w);
+        pq.add(new Node(0,0));
+        while(!pq.isEmpty()){
+            Node top = pq.peek();
+            pq.remove();
+            
+            int node = top.node;
+            int wt = top.w;
+            
+            if(visited[node] == 1) continue;
+            
+            visited[node]=1; // Add node to MST
+            ans+=wt;
+            for(int[] nbr: adj.get(node)){
+                int end = nbr[0];
+                int w = nbr[1];
+                
+                if(visited[end] == 0) {
+                    pq.add(new Node(end,w));
+                } 
+            }
+        }
+        return ans;
+    }
+}
+```
+
+#### Kruskal's Algorithm
+- Greedy approach
+- Start with Empty MST ( Only nodes , no edges )
+- Sort all edges in non descending order
+- start with min. weighted edge to max. weighted edge
+    - If this edge is creating cycle then ignore it
+    - Else Add this edge in MST.
 
 https://amortizedminds.wordpress.com/2015/07/23/minimum-spaning-tree-kruskals-algorithm/
 
+```java
+class Solution {
+    static int spanningTree(int V, int E, List<List<int[]>> adj) {
+        // Code Here.
+        int visited[] = new int[V];
+        List<Node> edges = new ArrayList<>();
+        DisjointSetUnion dsu=new DisjointSetUnion(V);
+        int ans=0;
+        
+        for(int i=0;i<adj.size();i++){
+            for(int[] e : adj.get(i)){
+                int start = i;
+                int end = e[0];
+                int wt = e[1];
+                
+                if(start < end)
+                    edges.add(new Node(start,end,wt));
+            }
+        }
+        Collections.sort(edges, (l,r)->l.w-r.w);
+        
+        for(Node edge: edges){
+            int start = edge.start;
+            int end = edge.end;
+            int wt = edge.w;
+            
+            if(!dsu.isSameComponent(start,end)) {
+                ans+=wt;
+                dsu.unionBySize(start,end);
+            }
+        }
+        
+        return ans;
+    }
+}
+```
 
 ## Topological Sort
 
