@@ -143,7 +143,50 @@ References:
     - [Youtube: Hello Interview](https://www.youtube.com/watch?v=fhdPyoO6aXI)
 
 # Design Dropbox or Google Drive
-- 
+- Functional Requirements
+    - Upload a file
+    - Download a file
+    - Automatically sync file across devices
+- Non Functional Requirements
+    - availability >> consistency
+    - low latency upload and downloads
+    - support large files upto 50 GB
+    - High data entity (syn accuracy)
+- Core Entities
+    - File (raw data)
+    - File meta data
+    - Users
+- APIs
+    - Upload: POST /files --> 200
+    - Download: GET /file/:fileId --> File and FileMetadata
+    - Sync: GET /file/changes --> filesIds[]
+- High level design Important points
+    - Upload file -- store in S3 -> blob storage
+    - Maintain meta data in Primary DB
+    - Sync local change to remote
+        - Put watcher on files using OS specific native APIs
+        - Need to have local DB for maintaining local file systems data
+    - Sync remote change to local: via sync api calls
+- Deep Dives
+    - 50 GB large files support
+        - Upload directly to S3
+        - Ask S3 to give pre-signed link where client can upload data
+        - Need to use chunking so that small chunks can be uploaded
+        - maintain hash of the bytes to see if content is same across different level
+        - chunks can be stored inside file meta data object | NoSQL DynamoDB can be used for it
+        - Before updating chunk status as uploaded we can check with S3 if its actually uploaded ?
+        - We can get S3 notification as CDC from Object storage
+    - CDN is not needed here as user might be doing operationg with his own file and S3 data centre might be located near geo region. CDNs are pretty expensive.
+    - Data can be compressed to transfer fewer bytes over network
+    - Sync fast
+        - Long Polling / Websocket will be overkill here
+        - Adaptive polling from client / Refresh button
+        - Get only delta updated chunks for any updated file.
+    - Sync to be consistent (Optional)
+        - Event bus might be put which tracks all the changes
+        - DB maintains last processed custor
+        - Dropbox does this
+        - Reconcilliation periodicall like weekly and check all the user folders and files
 - References
     - [Youtube : Hello Interview](https://www.youtube.com/watch?v=_UZ1ngy-kOI)
 
