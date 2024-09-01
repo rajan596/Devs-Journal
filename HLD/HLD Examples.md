@@ -11,6 +11,8 @@
 - [Dropbox](#design-dropbox-or-google-drive)
 - [Design Dropbox](#design-dropbox-or-google-drive)
 - [Design Uber](#design-uber)
+- [Design Twitter](#design-twitter)
+- [Design Ad click aggregator](#ad-click-aggregator)
 
 # URL Shortner
 
@@ -169,7 +171,11 @@ References:
     - Sync remote change to local: via sync api calls
 - Deep Dives
     - 50 GB large files support
-        - Upload directly to S3
+        - Upload directly to S3 using multipart upload. [S3 Documentation for Multipart upload](https://aws.amazon.com/blogs/compute/uploading-large-objects-to-amazon-s3-using-multipart-upload-and-transfer-acceleration/)
+            - Initiate the multipart upload and obtain an upload id
+            - Divide the large object into multiple parts, get a presigned URL for each part, and upload the parts of a large object in parallel
+            - Complete the upload by calling the complete api
+            - S3 merges all the chunks upon client finalisation call
         - Ask S3 to give pre-signed link where client can upload data
         - Need to use chunking so that small chunks can be uploaded
         - maintain hash of the bytes to see if content is same across different level
@@ -187,6 +193,9 @@ References:
         - DB maintains last processed custor
         - Dropbox does this
         - Reconcilliation periodicall like weekly and check all the user folders and files
+    - Security
+        - Encryption in transit
+        - Encryption in Object storage. Supported by S3
 - References
     - [Youtube : Hello Interview](https://www.youtube.com/watch?v=_UZ1ngy-kOI)
 
@@ -234,6 +243,93 @@ References:
     - Find my friend
 - References
     - [Hello Interview : Youtube](https://www.youtube.com/watch?v=lsKU38RKQSo&t=1s)
+
+# Design Twitter
+- Functional Requirements
+    - CRUD operations on new tweet
+    - Follow other users
+    - View a timeline of tweets
+    - Like, Reply, retweet
+    - Search for tweets
+- Non Functional Requirements
+    - Scale to 100+ M users
+    - handle hgh volume of tweets
+    - availavility >> consistenty
+    - Security & Privacy of data
+    - Low latency
+- Core Entities
+    - Tweet
+    - User
+- API 
+    - /search?term={term}&sort_by={LIKE|timestamp}&page=0
+- high level design Imp points
+- Deep Dives
+    - How to scale search ?
+        - As total data can be in PBs
+        - We need inverted index DB
+        - ElasticSearch is a powerful search service based on Lucene which supports horizontal scaling, replication, and creating arbitrary full-text indexes on your data - a perfect fit for this problem.
+    - To manage high write throuput : 2 Stage architecture
+        - Put like count in Redis and once count reaches to the power of 2 Or 100/1000 then update DB
+        - Ranking layer finds top 100/1000 tweets by like, sorts and returns to the user
+    - Pagination
+        - Offset pagination with result cache
+            - Fetch extra data from DB than required and cache in Redis
+            - Return required N tweets and cache remaining tweets in cache
+            - Reduces DB load but Huge data needs to be caches
+
+# Ad Click Aggregator
+- Functional Requirements
+    - User clicks an ad and gets redirected to advertiser's website
+    - Advertiser can query matrix over time with 1 min granularity
+- Non Functional Requirements
+    - Scalable to support 10k click per second
+    - Low latency analytics query < 1s
+    - Near real time
+    - Idempotency of ad clicks
+    - Fault tolerance
+    - Data Integrity
+- Scale [Better to discuss scale for platform interview questions]
+    - 10M ads at given time
+    - 10k ad clicks per second at peak
+- System Interface & Data Flow (Can be skipped as well)
+    - Input to system
+        - Click data
+        - Adv query
+    - Outout
+        - Redirections
+        - Adv -- aggregated click Metrics
+    - Data Flow
+        - click data comes into the system
+        - user is redirected
+        - click data validation (like idempotency)
+        - click data logged
+        - click data aggregated
+        - aggregated data queried
+- High level Imp points
+    - Giving redirection url to browser may have security concerns like user can directly go to adv link from DOM and not call ad click API
+    - User click request is received to our service and our service gives 302 redirect response and logs click
+    - Kafka can be introduces to process click events
+- Deep dives
+    - Apache Flink can help with the Stream aggregations. 
+        - We can specify aggregation window like 1 min
+        - We can also specify Flush interval like 10 sec. Every 10 sec update DB
+    - When some popular ad many people are clicking..
+        - Hot partitioning issue in Evetn stream as it might be shareded by partition
+        - Hot partition can be handle by making key as -> {adId}:{O-N} random no. which will evently distribute popular add to diff partitions
+    - Handle fault tolerance
+        - Enable Retention policy in Kafka/kinesis like 7 days. This handles Flink job going down scenarios
+        - For large aggregation window size like 1 day - checkpoint can be introduced where Flink stores snapshot in S3 every couple of hours
+        - No need for checkpoint for 1 min aggregation window
+    - Data Integrity
+        - Periodic reconcilliaton to ensuce accuracy of data
+        - Dump Kinesis data in S3. Periodically like everyday run Spark job and consume data from S3 , do aggregation --> give it to reconcilliation worker. Worker overrides data in OLAP db in case mismatch is found
+    - Idempotency
+        - generate Ad impression id - unique id and send it to browser. When user clicks send the same impression id to server
+        - store impression id in Redis for some time.
+        - Some user can change impression id can can do manual hits
+            - To handle this impression id can be signed one and send to browser
+            - Browser sends signed impression id -> validation this id from server side.
+
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

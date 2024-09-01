@@ -727,6 +727,28 @@ class DisjointSetUnion {
 }
 ```
 
+Mini version
+```java
+class DSU {
+    int parent[];
+    public DSU(int size){
+        parent = new int[size];
+    }
+
+    public int findParent(int x){
+        if(parent[x] == x) return x;
+        return parent[x] = findParent(parent[x]);
+    }
+
+    public void union(int x, int y){
+        int px = findParent(x);
+        int py = findParent(y);
+
+        parent[py] = px;
+    }
+}
+```
+
 https://amortizedminds.wordpress.com/2015/07/07/disjoint-set-union-data-structure/
 https://amortizedminds.wordpress.com/2015/08/01/detect-cycle-in-an-undirected-graph-using-disjoint-set-union/
 

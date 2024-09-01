@@ -33,7 +33,7 @@ Inspired by [Hello Interview's](https://www.hellointerview.com/) framework listi
 |15|--|PB|
 
 ## Core Entities
-
+- *Not required for Infrastructure design question*
 - It helps to get understanding of what data will be persisited in system and exchanged by the APIs.
 Mention core entities of system. Like for online Judge it would be
 1. user
@@ -43,12 +43,14 @@ Mention core entities of system. Like for online Judge it would be
 5. Competition
 
 ## API or Interface
+- *Not required for Infrastructure design question*
 
 - This will be user facing public APIs
 - It will solve our Functional requirements and Core Entity data flow
 - Mention REST APIs for each of the functional requirements
 
-## Data Flow (For Platform Design Questions)
+## System Interface and Data Flow (For Infrastructure/platform Design Questions)
+
 
 ## High level design
 
