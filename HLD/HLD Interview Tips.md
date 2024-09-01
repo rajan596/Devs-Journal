@@ -9,6 +9,8 @@ Inspired by [Hello Interview's](https://www.hellointerview.com/) framework listi
 
 # System Requirements
 
+https://www.hellointerview.com/learn/system-design/in-a-hurry/delivery
+
 ## Functional Requirements
 - Features of the system
 - It should start with **User should be able to..**
