@@ -13,6 +13,7 @@
 - [Design Uber](#design-uber)
 - [Design Twitter](#design-twitter)
 - [Design Ad click aggregator](#ad-click-aggregator)
+- [Design Web crawler](#design-web-crawler)
 
 # URL Shortner
 
@@ -330,6 +331,68 @@ References:
             - To handle this impression id can be signed one and send to browser
             - Browser sends signed impression id -> validation this id from server side.
 
+# Design Web Crawler
+- This is a Platform style question
+- Problem: Extract the data from web to train LLM
+- Functional Requirement
+    - Web crowler with initial seed urls
+    - extract the data and store the text for later processing
+- Non Functional Requirement
+    - *Important to ask for scale of the system, because it will have great influence in our system*
+    - Crawl 10B pages having size 2MB in 5 days
+    - Fault tolerance to handle failures gracefully and resume crawling without loosing progress
+    - Politeness to adhere to robots.txt and not overload website servers
+- APIs or System Interface
+    - Input: Seed of URLs
+    - Output: Text data extracted from web pages
+- Data flow
+    - Take seed URL from frontier and request IP from DNS
+    - Fetch HTML from external server using IP
+    - Extract the text from the HTML
+    - store the text data in database
+    - Extract any linked URLs from web pages and add then all to the list of URLs to crawl
+    - Repeat above all steps
+- High level design Important points
+    - Frontier queue: Queue where initial seed URLs were feed. all other urls will be pushed to this queue for processing
+    - crawler fetches data from queue and fetches data from URL and maintains entry in DB
+    - Store extracted data in S3 along with raw HTML data
+    - We can maintain DB like Dynamo or Postgres to store URLs and their S3 content link
+- Deep dives
+    - Being fault tolerance
+        - Break the system into 2 parts. 1. Fetch 2. Text Extraction
+        - This way any stage can be reprocessed / resumed independently
+        - When URL fetch fails we can have queue as SQS as exponential backoff with visibilityTimeout and max retries
+        - If it fails multiple times then URL can be added to dead letter queue
+        - If crawler goes down - spin up new machine
+    - Politeness
+        - crawler should not overload original website and its functionality should not be impacted
+        - Check for site having robots.txt - Its their for crawler instructions
+        - It will have delays, allow lists, disallowed site pages
+        - Crawler need to read robots.txt and check if crawling is allowed or not
+        - Respect delays mentioned in this file
+        - We can maintain last crawl time for any domain in our DB and entry might be valid upto defined period
+        - Rate limiting can be introduced using Redis. We need to add *jitter* here to avoid all workers picking same domain at same time and getting rate limited again
+    - Handle scale of data and 5 daty window
+        - To handle this scale we need to see how many machines will be required here.
+        - BOTE calculation will be required here. This is an I/O intensive task
+        - Find machine capacity considering max bandwidth available is 400 Gbps or 50 GB/sec
+        - We can assume we can only utilise ~30-50% of the bandwidth of machine.
+        - Calculate how many days it will take at this rate and accordingly take servers
+    - Ensure same URL do not get processed again
+        - Maintain URL data in DB and check before processing.
+        - Need to have index on URL
+        - Create index on Hash in meta data DB - might be GlobalSexondayIndex
+        - Bloom Filter: Probabilistic DS which Trades accuracy for trade. False Positives... (Might be overkill)
+    - When multiple URL have same data
+        - Maintain hash of content. Check if this content is already available in DB. If available then ignore the page
+    - Crawler trap
+        - URLs might be linking to other URLs with no content recursively
+        - We can maintain depth as well in meta data DB and we can only go upto 20 depth
+- Notes
+    - DNS name resolution need to happen for every URL. DNS provider can rate limit sstem if it queries too frequently.
+    - We can either use paid DNS service, keep multiple DND providers OR can cache domain -> IP from DNS response.
+- References
+    - https://www.hellointerview.com/learn/system-design/answer-keys/web-crawler
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

@@ -27,7 +27,7 @@
     - Geospatial Index
         - GEOADD homes_list -122.2 37.89 rajan_home
         - GEOSEARCH homes_list FROMLONLAT -122.2 37.89 BYRADIUS 5km WITHDIST
-    - PubSub : Chat Room
+    - PubSub : Chat Room. At most one guarentee. Reliability issue. Fast
 
 ## Scaling with Redis
 - If data is huge single Redis instance cant handle it
