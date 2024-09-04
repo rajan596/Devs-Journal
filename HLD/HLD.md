@@ -593,6 +593,10 @@ OK
 |Write back|Data is updated in Cache and later updated in DB|
 
 
+# Pagination techniques
+
+- Offset based
+- Cursor based
 
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**

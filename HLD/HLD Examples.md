@@ -412,8 +412,37 @@ References:
     - Add comment: POST /comment with data {comment:"", streamId:""}
     - Fetch past comments : GET /comment-history/:streamId [Imp: Pagination]
 - High level Design imp points
-    - 
+    - Comments can be stored in NoSQL db as it dont need any joins or Transactions support
+    - Add comment will be stored in NoSQL DB by Comment Manager service
 - Deep Dives
+    - *WebSocket* is a good solution but overkill here because here R:W ratio is very different
+        - User will do very less coments but will continously get new comments. R/W ratio is not balanced.
+        - This indicated that we dont need 2 way communication.
+        - **SSE** is a good choice over here as its Unidirectional and works over HTTP.
+        - Easier to setup with existing Infra
+    - Pagination
+        - Offset based 
+            - Not good for high moving data
+            - In case of add/delete data result can be incorrect or duplicate data will be sent
+        - Cursor based
+            - return custor for lastCommentId
+            - If built index on cursot reduces the load on DB
+        - Cursor pagination with prefetching and caching
+            - Prefetch N*pagesize data from DB and maintain in cache
+    - How to support millions of concurrent viewers ?
+        - Separate our read and write traffic because R:W ration is not balanced
+        - Comment add service will send new comment in Event queue for SSE servers to consume
+        - Each SSE server will maintain liveStreamId -> {conn1, conn2, conn3, ...}
+        - SSE server will consume Pub/Sub event and send the data to all connections
+        - Partition Pub/Sub by videoId so SSE can subscribe to only relevant videoeId channel
+        - L7 Load balancer: To make sure users watching live stream land on same server to avoid multiple/all server subscribing to all videoids more itnelligent load balancing technique can be used
+            - Less SSE servers will be subscribed to the Pub/Sub resulting in efficient handling
+            - Each SSE server will be subscribed to less Pub/sub channels which will reduce n/w traffic, computations
+        - Dispatcher Service
+            - It gets comments from comment service
+            - It knows where to forward this request to which SSE machine
+            - It takes load of event distribution and reduces strain on SSE servers
+            - But this service need to have accurate details of SSE server details
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)
