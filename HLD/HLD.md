@@ -592,6 +592,8 @@ OK
 |Write through|First write in Cache, the in DB|
 |Write back|Data is updated in Cache and later updated in DB|
 
+
+
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**
 - DDIA notes: https://docs.google.com/document/d/1Yn6ee7WEK6r6q49mVX7uqbEtoYc9zizaQeIQy_c9Oh8/edit

@@ -14,6 +14,7 @@
 - [Design Twitter](#design-twitter)
 - [Design Ad click aggregator](#ad-click-aggregator)
 - [Design Web crawler](#design-web-crawler)
+- [Design Facebook Live comments](#design-facebook-live-comments)
 
 # URL Shortner
 
@@ -393,6 +394,26 @@ References:
     - We can either use paid DNS service, keep multiple DND providers OR can cache domain -> IP from DNS response.
 - References
     - https://www.hellointerview.com/learn/system-design/answer-keys/web-crawler
+
+# Design Facebook Live comments
+- Functional Requirements
+    - Comment on a live streaming video
+    - See all comments in near real time
+    - view coments before users joining live stream
+- Non Functional Requirements
+    - prioritise availability over consistency
+    - Low latency in broadcasting comments in near real time
+    - Scale to millions of views and thousands of commets / sec
+- Core Entities
+    - User
+    - Live stream
+    - Comment
+- APIs
+    - Add comment: POST /comment with data {comment:"", streamId:""}
+    - Fetch past comments : GET /comment-history/:streamId [Imp: Pagination]
+- High level Design imp points
+    - 
+- Deep Dives
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

@@ -58,7 +58,9 @@ Mention core entities of system. Like for online Judge it would be
 
 - Focus on Functional Requirements mentioned earlier as discussed with Interviewer
 - Just try to build a system that satisfies those functional requirements and try to avoid any distractions (distraction -> not part of Fn requirements)
-- 
+- Keep design simple
+- When adding any new component ask yourself Is this needed ?
+- Done Over Engineer the design
 
 ## Deep dive
 
