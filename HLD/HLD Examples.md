@@ -1,4 +1,4 @@
-# Content Overview
+# System Design Problems
 - [URL Shortner](#url-shortner)
 - [Top K Problem](#top-k-problem)
 - [Location Tracking](#location-tracking-system)
@@ -15,6 +15,7 @@
 - [Design Ad click aggregator](#ad-click-aggregator)
 - [Design Web crawler](#design-web-crawler)
 - [Design Facebook Live comments](#design-facebook-live-comments)
+- [Design Yelp](#design-yelp)
 
 # URL Shortner
 
@@ -443,6 +444,39 @@ References:
             - It knows where to forward this request to which SSE machine
             - It takes load of event distribution and reduces strain on SSE servers
             - But this service need to have accurate details of SSE server details
+- References
+    - https://www.hellointerview.com/learn/system-design/answer-keys/fb-live-comments
+
+# Design Yelp
+- Functional Requirements
+    - Search places nearby using terms & location
+    - rate place
+    - user will be able to see detailed page for any place
+- Non Functional Requirements
+    - availability > consistency
+    - 1:1000 write:read ratio
+    - low latency in search
+    - Integrity in Ratings
+- Core Entities
+    - Place
+    - Rating
+    - Profile
+    - Location
+- API
+    - GET /search?term={term}&lat={lat}&lang={lang}&cursor={cursor}&pageSize=100 -> Partial<Place> [No Auth Required]
+    - GET /place/:placeId [No Auth Required]
+    - GET /place/:placeId/reviews?cursor={cursor}&pageSize=100 -> Reviews[] [No Auth Required]
+    - POST /place/ratings -> 200 OK
+- HLD Imp Points
+    - Since there are very less writes we can merge search and write service in one service
+    - Elastic search can be used as search engine
+    - When new places gets updated ES needs to be re-indexed with that data
+    - Simple SQL database can be used for place and uniqueness of ratings can be maintained using UniqueKeys in DB
+    - ES supports data in x unit radius from given location infor - supports geohashing
+- Deep dives
+    - TBA
+- References
+    - https://www.youtube.com/watch?v=pFTyGG4mORk
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

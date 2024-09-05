@@ -14,6 +14,7 @@ https://www.hellointerview.com/learn/system-design/in-a-hurry/delivery
 ## Functional Requirements
 - Features of the system
 - It should start with **User should be able to..**
+- For Product style problems as a candidate we can make decisions on product requirements and act as a Product guy
 
 ## Non functional Requirements
 
@@ -61,6 +62,8 @@ Mention core entities of system. Like for online Judge it would be
 - Keep design simple
 - When adding any new component ask yourself Is this needed ?
 - Done Over Engineer the design
+- If you know putting any component will make system more effifient it can be done at this step as well to save further time
+- Prefer simplicity over Over Engineering solutions
 
 ## Deep dive
 
