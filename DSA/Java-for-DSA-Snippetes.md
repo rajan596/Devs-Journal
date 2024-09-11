@@ -1094,3 +1094,14 @@ https://amortizedminds.wordpress.com/2015/07/19/counting-inversion-spoj-invcnt/
 ## nCr % m
 
 https://amortizedminds.wordpress.com/2015/07/02/ncr-m/
+
+## Patterns
+
+
+### Sliding Window
+- Questions generally says find the count of sub arrays following certain properties
+- Solution in N*N is generally not acceptable.
+- Examples
+    - https://leetcode.com/problems/count-subarrays-with-fixed-bounds/ [Hard]
+    - 
+    

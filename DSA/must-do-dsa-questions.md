@@ -5,3 +5,10 @@
 |[Basic Calculator I,II,III](https://leetcode.com/problems/basic-calculator/description/)|Test cases | Medium | Stack |
 |[Word Search II](https://leetcode.com/problems/word-search-ii/description/)|Trie Usage|Hard|Trie
 -----------------
+
+# Good Questions 
+
+## Sliding Window
+- https://leetcode.com/problems/count-subarrays-with-fixed-bounds/
+    - Good use of slidinw window technique
+    - Hard : Difficulty level
