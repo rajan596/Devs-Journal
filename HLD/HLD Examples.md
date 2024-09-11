@@ -1,4 +1,4 @@
-# System Design Problems
+# Product Design Problems
 - [URL Shortner](#url-shortner)
 - [Top K Problem](#top-k-problem)
 - [Location Tracking](#location-tracking-system)
@@ -14,8 +14,10 @@
 - [Design Twitter](#design-twitter)
 - [Design Ad click aggregator](#ad-click-aggregator)
 - [Design Web crawler](#design-web-crawler)
+- [Design Facebook Feed](#design-facebook-feed)
 - [Design Facebook Live comments](#design-facebook-live-comments)
 - [Design Yelp](#design-yelp)
+- [Design Tinder](#design-tinder)
 
 # URL Shortner
 
@@ -396,6 +398,66 @@ References:
 - References
     - https://www.hellointerview.com/learn/system-design/answer-keys/web-crawler
 
+# Design Facebook Feed
+- Functional Requirements
+    - User shoud be able to create a post
+    - Follow friends
+    - view their timeline in chronological order
+- Non Functional Requirements
+    - Highly available with eventual consistency upto 2 mins
+    - Viewing the post should be fast i.e, < 500 mS
+    - Should be able to handle massive scale of users
+    - unlimited follow/followers
+- Core Entities
+    - User
+    - Follow
+    - Post
+- APIs
+    - Create a post
+        - POST /post with body { data:"post1" } -> 200 OK
+        - JWT Authentication
+    - Follow friend
+        - POST /users/follow {followerId:"user345"} -> 200 OK
+    - View timeline
+        - GET /timeline?cursor={:lastPost}&pageSize=100 -> Post[] 200 OK
+- HLD Imp Points
+    - Create a post
+        - Post service inserts data in post DB.
+        - This can be simple DB like Relational or NoSQL like DynamoDB
+    - Follow friend
+        - Can use graph DB like Neo4J but not required for our use case since we dont need traversals
+        - Create entry in Follow table. 
+    - View timeline
+        - Get the follower list, get the posts from followers, sort them and return
+        - For quick lookup we will need indexing in PostDB
+            - partition Post data by userId
+            - sort them by timestamp
+        - Pagination / Infinite scroll
+            - Maintain cache of Posts when no data exists in Cache. Fetch from DB and store ~ pageSize*50 data
+            - User will send *timestamp* as a cursor and we will return data older than passed timestamp value
+            - maintain cache with eventual consistent limit TTL like 1 or 2 mins
+- Deep dives
+    - Hanlde user who is following a large number of users **Fanout Problem**
+        - We need to compute the feed on write and keep a precomputed *Feed table*
+        - Feed table will have feedUserId, postId, timestamp
+        - when any post is created at create time we will check who follows this person and we can then add entry for all the followers in table
+        - Partition can be based on user_id and sort key can be timestamp
+    - Handle user having large number of followers
+        - A popular account can have millions of followers. Writing in feed table for all followers will create too much load on DB and create post worker will be busy creating entries in DB
+        - We can introduce async queue in-between to make the process async and make create post service faster
+        - Still we have problem of huge no. of writes for popular accounts
+        - We can set *threshold* to avoid precomputations for accounts having followwe count > threshold. Instead keep this result handy at the time of feed generation
+        - When Feed request comes use precomputed feed table data + popular account posts and merge both post data and return to user.
+    - Some posts are popular and valid for few days while some post reads goes to zero as time passes
+        - Brings issue of hot key (posts) in DB
+        - Good Solution: We can use cache as LRU with long ttl for popular posts. So most of the time popular post data will retrieved from Cache
+            - Hot key problem then will be propogated to Cache. Cache partitioning will be difficult if certain partition gets hot keys
+        - Best Solution: 
+            - Rather than partitioning cache data across machines, we can just replicate cache across N machines with M memory
+            - This will ensure all cache machine have same data with very high throughput. Theoratically Nx
+- References
+    - https://www.hellointerview.com/learn/system-design/answer-keys/fb-news-feed
+
 # Design Facebook Live comments
 - Functional Requirements
     - Comment on a live streaming video
@@ -477,6 +539,137 @@ References:
     - TBA
 - References
     - https://www.youtube.com/watch?v=pFTyGG4mORk
+
+# Design Local delivery store like gopuff
+- Functional Requirements
+    - Query available items to buy under 1 Hr based on location
+    - User can order goods
+- Non Functional Requirements
+    - Customer should be able to order from any store within 1 Hr delivery time
+    - item availability request should be fast
+    - Consistency: No 2 customer place same order for same physical good
+    - Orders: 1M orders/day
+    - References
+        - https://www.hellointerview.com/learn/system-design/answer-keys/gopuff
+- Scale
+    - 1M orders / day ~ 1o^6/10^5 ~ 10 orders / sec
+    - considering uneven traffic we can assume peak traffic as ~50 orders / sec
+    - queries: 5% traffic of orders --> 20k requests / second 
+- Data Entities
+    - Order [id, userId, date]
+    - Item [id, name, sku]
+    - OrderItem [orderId, itemInstance]
+    - ItemInstance [id, itemId, dcId, status]
+    - DistributionCentre [lat, long]
+- APIs
+    - GET /avalaility?lat={}&long={}&items={item1,item2}
+    - POST /order {lat: LAT, long: LONG, items: ...}
+- HLD Important Points
+    - Find DSs who can deliver in 1 Hr
+        - Pick data from DC table having distance < x unit and check it agains timeservice having distance < 1 Hr
+        - When available API is called use this data to prune down search results
+    - Query available items
+        - Query from Inventory DB
+        - Put a cache in-between to get most of the data from cache with 1 min TTL to maintain freshness
+        - Best Solution: Since data is mostly group in near by DC locations. We can group them based on region id like initial 3 digits of postal code in same partition and we can have replicas of partitions to have better throuput. We can tolerate bit of inconsistency here.
+    - Order Item **String Consistency** | **Double Booking**
+        - If we are maintaining inventory data in different data store like Dynamo and Orders in ACID db then we will can use 3 Phase commit and we will need transaction manager. This will bring additional complexity in our system
+        - Same DB for Inventory and Orders - PostgreSQL: 
+            - Use Transactions with Isolation level as Serialization
+            - In transaction check if inventory items are available -> if yes then create new order -> update items as ordered and then return order to user
+        - Problems: Unable to scale independenyly inventory and orders and need to use same DB
+- Deep Dives
+    - At the time of checkout items are showing as Unavailable
+        - Since multiple people could have added items in cart so many people would get frustrated by seeing Item unavailable error at the time of checkout
+        - We will need to add some reservation for x minutes when item is added to card and then we will need to free it if not checked out
+        - Possible Solution: Adding cache to maintain locked items. We will need to keep cache data in sync. We also need to read from cache before returning available items to user
+        - Ideal Solution
+            - Add a status - *Reserved* and expiration timestamp in ItemInstance
+            - When user add in cart mark it as Reserved with 60 min expiration timestamp
+            - When user do checkout update status to Sold
+            - Add background worker to periodically check for expired reservations and update status to Available
+    - Late allocation of Distribution Centres
+        - Some DCs having higher population density will get more orders while some DCs will be underutilised
+        - Sol 1: We can put some rule engine which based on availability can assign DCs
+        - Sol 2: Rule Engine - Considers current inventory, reservations, geographycal distribution
+        - Sol 3: [Complex] Create a Promise entity which will give list of DCs which can fulfill the order
+            - Instead of creating reservations, create Promise
+            - Availability service will consider Promise and deduct availability based on Promise data
+            - Resolve Promise when order is placed
+
+# Design Tinder
+- Functional Requirements
+    - See potential match as per filters & nearby location --> Feed
+    - Allow left and right swipe
+    - Match notification
+    - Out of scope
+        - Chat between them
+        - premium subscription unlimited swipes. We will assume unlimited swipes
+- Non Functional Requirements
+    - Low latency in showing nearby profiles & almost zero time in next profiles one by one
+    - System should be highly available
+    - Scale to 20M DAU, ~200 swipes/user/day
+    - Do not show repeated profile user has already seen
+- Core Entities
+    - User / UserProfile
+    - Match (userA <-> userB)
+    - Swipe -> Expression of saying Yes or No by usera to userb
+    - Location
+- API
+    - View Feed: GET /feed?location={}&distance={} -> User[]
+        - client can load and show one by one. Keep some pool in UI to avoid api call when swipe happens
+        - No need for pagination as client can request more recommendations when existing list exhausted
+    - Swips: POST /swipe/{target_user} body : { intent={Like|Dislike} }
+- High level design
+    - User can define filter and other users can see profile in recommendation **Challenging part**
+        - Approach 1: Direct DB query
+            - Not scalable and has higher latency
+            - User will have to wait for good amount of time between page loads
+        - Approach 2: Cache DB Response in cache and directly serve from there
+            - Zero time between page loads
+            - Problems in cache staleness
+        - Approach 3: **Feed Cache based off user Index**
+            - We need to rank profiles based on user filters. Some profile will be more relatable. This mean we need some kind of *ranking*
+            - Since we are looking for nearby profiles location is main criteria and nearby user profile should reside nearby. which indicates we need to *partition data based on location*
+            - Redis or ElasticSearch based solution can be used here.
+            - CDC pipeline to keep data in-sync with UserDB
+            - Maintan user feed cache when app opens or profiles are abount to get exhaused while swiping. Upon dehyration in cache feed load more profiles from ES/Redis.
+            - Index + Pre computed feed -> makes system faster
+            - Challenges: Complexity, reliable CDC, Density uneven distribution for dense location users, Cache staleness
+    - left and Right swipe
+        - Upon user swipe POST api will be triggered
+        - Our system is write heavy and lot of swipe data is expected to store for swiping_user -> target_user and intent.
+        - *Cassandra* will be a good choice here as its write optimised and data can be partitioned using swiping_user.
+        - Challenges: Eventual consistency with Cassandra
+    - Match Notification
+        - When swipe request comes we can check for stored intent by target user. If we find intent=yes with incoming intent=yes then we can trigger notification workflow by other service
+- Deep Dives
+    - How to avoid showing user same profile again ?
+        - Approach 1: DB query. 
+            - Efficient as data is partitioned based on userid
+            - If user has long swipe history then checking the data might be not trivial
+            - If system is eventual consistent DB might not return data which user has just seen which may trigger showing same profiles again
+        - Approach 2: Approach 1 + client side cache for recently viewed profiles
+            - client can maintain last K swipes and filter any swipe getting repeated
+        - Approach 3: Cache + Contains check in DB + Bloom Filter
+            - For users with large swipe history beyond certain threshold we can maintain Bloom filter
+            - It will accurately say if user_id is shown to user or not but can also say its shown which was not shown actually. Hence, False Positive. We might never show some profiles to user
+            - We can tune Bloom filter to reduce error percentage
+            - Challenges
+                - Cache Bllom filter needs to be updated upon every swipe
+                - If node goes down needs recalaulation of Bloom filter which can be expensive
+    - Cache staleness: When user changes criteria or changes location and no longer meets feed criteria
+        - Since data is cached we need someway to remove out of criteria matcher users from feed
+        - What happens when user suggested in feed changes the criteria..?
+        - Have Cache TTL < 1 Hr. Background worker will preiodically calculate feed and cache it for Active users
+        - We can also tune no of profiles to cache in cache
+        - When requesting user updates criteria at that time as well we can selectively choose to re-calculate feed.
+        - *Tip*: having tunable parameters in system like redis ttl, profiles count in cache, set of users to calcuate feed for can be udeful to find optimised parameter tuning
+    - Reliable match creation ?
+        - Since system is eventual consistent how to avoid match miss as data replication can take some time ?
+        - We can have cached data for user -> yes swipes and can be partitioned by user_id to accomodate for replication delays
+- References
+    - https://www.hellointerview.com/learn/system-design/answer-keys/tinder
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

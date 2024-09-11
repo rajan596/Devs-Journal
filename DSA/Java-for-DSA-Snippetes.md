@@ -26,6 +26,10 @@ Arrays.sort(arr);
 // Sort an array if arr is ArrayList
 List<Integer> arr = new ArrayList();
 Collections.sort(arr);
+
+// Convert List to primitive array -> []
+List<int[]> list = new ArrayList<>();
+list.toArray(new int[list.size()][]);
 ```
 
 ### Binary Search in Array
@@ -35,7 +39,7 @@ public class BinarySearchUsingLib {
 
         /**
          *
-         index of the search key, if it is contained in the array; otherwise, (-(insertion point) - 1).
+         index of the search key, if it is contained in the array; otherwise, (-(insertion point - 1)).
          The insertion point is defined as the point at which the key would be inserted into the array:
          the index of the first element greater than the key,
          * */
