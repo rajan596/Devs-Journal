@@ -1,23 +1,24 @@
 # Product Design Problems
-- [URL Shortner](#url-shortner)
-- [Top K Problem](#top-k-problem)
-- [Location Tracking](#location-tracking-system)
-- [Video streaming](#video-streaming--chat-app)
-- [Design LeetCode](#design-leetcode)
-- [Rate Limiter](#rate-limiter)
-- [Distributed Scheduler](#distributed-scheduler)
-- [Tagging Service](#tagging-service)
-- [Ticket Master](#ticket-master)
-- [Dropbox](#design-dropbox-or-google-drive)
-- [Design Dropbox](#design-dropbox-or-google-drive)
-- [Design Uber](#design-uber)
-- [Design Twitter](#design-twitter)
-- [Design Ad click aggregator](#ad-click-aggregator)
-- [Design Web crawler](#design-web-crawler)
-- [Design Facebook Feed](#design-facebook-feed)
-- [Design Facebook Live comments](#design-facebook-live-comments)
-- [Design Yelp](#design-yelp)
-- [Design Tinder](#design-tinder)
+1. [URL Shortner](#url-shortner)
+2. [Top K Problem](#top-k-problem)
+3. [Location Tracking](#location-tracking-system)
+4. [Video streaming](#video-streaming--chat-app)
+5. [Design LeetCode](#design-leetcode)
+6. [Rate Limiter](#rate-limiter)
+7. [Distributed Job Scheduler](#distributed-scheduler)
+8. [Tagging Service](#tagging-service)
+9. [Ticket Master](#ticket-master)
+10. [Dropbox](#design-dropbox-or-google-drive)
+11. [Design Dropbox](#design-dropbox-or-google-drive)
+12. [Design Uber](#design-uber)
+13. [Design Twitter](#design-twitter)
+14. [Design Ad click aggregator](#ad-click-aggregator)
+15. [Design Web crawler](#design-web-crawler)
+16. [Design Facebook Feed](#design-facebook-feed)
+17. [Design Facebook Live comments](#design-facebook-live-comments)
+18. [Design Yelp](#design-yelp)
+19. [Design Tinder](#design-tinder)
+20. [Design tweet Search](#design-tweet-search)
 
 # URL Shortner
 
@@ -87,8 +88,41 @@ References:
 3. Sliding window 
 
 # Distributed Scheduler
-
-[Youtube | ](https://www.youtube.com/watch?v=ur3ioZhwG8w)
+- Functional Requirements
+    - Client should be able to schedule a job one time / periodic
+    - Job scheduler will call a configured API callback at the time of schedule
+    - Out of Scope
+        - Executing arbitaty code
+- Non Functional Requirements
+    - Handle 1 Billion Jobs per day ~ 10^9/10^5 = 10^4 => 10,000 jobs/second
+    - Job should not be executed multiple times for same timestamp
+    - Job execution failure should be handled properly. Retry as per client configurations
+    - There should be minimal delay between job schedule time and actual job being scheduled
+- High Level Design Important Points
+    - Job Details can be stored in HBase as its a distributed multi dimentional sorted map. Each cell is indexed by rowKey, colKey and timestamp
+    - Client can call Job Acceptor service. This service will validate the request and add an entry in DB and returns Job ID. This will also assign one partitionId to each job
+    - Job extractor service will scan DB and pick eligible jobs for execution and runs every N seconds. It will simply scan and publish data in RoQ.
+    - Worker consumers can consume the message from RoQ and do callback as per client preference and update DB with success/failure status.
+- Deep Dive
+    - How to scan large amount of jobs to be executed efficiently and Reducing delay between scheduled time and picked time?
+        - In-order to have good reach throuput to scan eligible jobs from DB we need to assign multiple workers which will do the scanning job.
+        - Now if multiple workers will do same query at same time then they will get same jobs to be executed.
+        - To solve this problem, Job Acceptor service assigns PartitionId to each job. Zookeeper can maintain worker nodes -> assigned partitions data and partition owner workers will do DB scan. This way we are able to do multiple scan at the same time from DB.
+    - Job do not get executed multiple times
+        -To ensure same partition is not assigned to multiple workers data is kept in zookeeper and one leader worker can do the job of partition assignmenet / reassignment.
+        - partitions can be reassigned in a round robbin fashion.
+    - How Job failures will be handles ?
+        - If job fails to execute, client can do immediate or exponential retries as per client configuration.
+        - If retry is required after some delay it can add data in retry queue
+        - If even after max retries request is not successfil message will be sent to Dead letter queue
+    - How to cope up with low worker processing and queue backlogs ?
+        - If queue size exceeds certain threshold, we can pause scans for a while until workers cope up with the data
+        - Bombarding RabbitMQ in case of slow workers can make RabbitMQ cluster unsable.
+        - We can have relevant time window for each request. If defined any API call after certain window will be dropped. Lets say sending OTP.
+- References
+    - [Clockwork: The Backbone of PhonePe’s 2 Billion Daily Jobs](https://tech.phonepe.com/clockwork-the-backbone-of-phonepes-2-billion-daily-jobs/)
+    - https://blog.algomaster.io/p/design-a-distributed-job-scheduler
+    - [Youtube | ](https://www.youtube.com/watch?v=ur3ioZhwG8w)
 
 # Tagging Service
 
@@ -670,6 +704,47 @@ References:
         - We can have cached data for user -> yes swipes and can be partitioned by user_id to accomodate for replication delays
 - References
     - https://www.hellointerview.com/learn/system-design/answer-keys/tinder
+
+# Design Tweet Search
+- Functional Requirements
+    - User should be able to search by any keyword
+    - User should be able to sort by likes/time
+    - User should be able to search results in pages upto 100
+- Non Functional Requirements
+    - Availability over consistency
+    - Read requests >>> New tweets
+    - Low latency while serving data
+        - New tweets can be served in < 30 sec
+        - All tweets should be discoverable even older/unpopular ones
+    - Should support high volume of requests
+- Scale
+    - 100M users -> 1 tweet/day, 10 likes/day and 1 search /day
+    - For simplicity lets assume 100k seconds per day
+    - Writes/sec = 100M * 1 per day / 100k seconds = 1k tweets/second
+    - Likes/sec = 100M * 10 per day / 100k seconds = 10k tweet likes/second
+    - Search/sec = 100M * 1 per day / 100k seconds = 1k tweet search/second
+    - Storage: 10 years* 365 days * 100M/day * 1kb => 365 TB of total tweets
+- Core Entities
+    - Tweet
+    - Likes
+    - Search term/keyword
+- APIs
+    - GET /search?query={term}&sort_order={Likes|Time}
+- High Level Design Important Points
+    - Indexing our tweets
+        - We need a Reverse Indes solution for this requirement
+        - ES is based on Lucene which supports Horizontal scaling, Replication, Arbitory text Index creation
+        - Challenges: Needs a lot of configurations to make it right. Operational overhead.
+    - Handling the large volume of writes to system
+        - 2 Phase architecture: Store Like count only when count reaches to the power of 2
+        - So we will have only approximate logarithmic view of our data
+        - Ranking service will pick top N tweets get their actual like counts and sorts before returning to user.
+        - ES can maintain approximateLogCount <-- which wil reduce load on ES to update viewes
+    - Pagination
+        - Fetch extra pages from DB and store it in cache with 1 Hr TTL. Challenges: Large amount of memory needed in Cache
+        - Re-use search result cache with timestamp. Maintain cache sorted chronological order. Get next N results from cache with timestamp < input timestamp
+- References
+    - https://www.hellointerview.com/learn/system-design/answer-keys/tweet-search
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

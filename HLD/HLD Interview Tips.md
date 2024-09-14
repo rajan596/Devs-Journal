@@ -26,6 +26,7 @@ https://www.hellointerview.com/learn/system-design/in-a-hurry/delivery
 - Do only if required.
 - Can ask interviewer if this is required. This consumes time and might not be meaningful all the time.
 - Can do if result of calculation has direct influence on design  
+- For simplicity we can consider *seconds in a single days are 100k* (actual -> 86,400). This makes easier in doing calculations
 
 |Zeroes|Traffic|Storage|
 |--|--|--|

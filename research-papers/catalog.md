@@ -1,4 +1,3 @@
-
 1. Google File System - https://lnkd.in/d2-wnyqZ
 2. Map Reduce Big Data Algorithm - https://lnkd.in/dvE8-s8M
 3. BigTable NoSQL Document Store - https://lnkd.in/drmvvSAK
