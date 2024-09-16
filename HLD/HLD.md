@@ -279,9 +279,14 @@ data: GOAL Manchester United 3 - 3 Manchester City
 - Partitioning is used to distribute data across nodes. But how do we handle node addition/removal with maintaining uniform data distribution  : **Consistent Hashing** comes to the rescue
 - Each node is assigned a range and Hash(key) = value --> is then mapped to the range which selects node.
 - If any node is deleted then next node's range increases and data moves there which creates ununiform data distribution.
-- To solve this, Consistent Hashing used virtual nodes to maintain uniform data.
+- To solve this, Consistent Hashing used virtual nodes to maintain uniform data. Multiple virtual nodes are placed in Consistent Hash Ring. Then actual physical machines are mapped with virtual nodes.
+- Hash both data keys and Node identifier with `same Hash function` 
+- Implementation
+  - When any key - *xyz* needs to be assigned then first we need to find its position in Ring. lets say using hash and module position comes to 5. Then we will need to see node available having position >= 5.
+  - Self balancing BST can be used for such operations. Node positions can be kept in BST and then the task is to find **successor** of 5 in BST.
 - DynamoDB,Memcached and Cassandra uses Consistent Hashing 
 - References:
+  - https://systemdesign.one/consistent-hashing-explained/
   - https://www.youtube.com/watch?v=UF9Iqmg94tk
 
 # Replication

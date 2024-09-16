@@ -36,6 +36,9 @@ https://www.hellointerview.com/learn/system-design/in-a-hurry/delivery
 |12|Trillian|TB|
 |15|--|PB|
 
+- References
+    - https://systemdesign.one/back-of-the-envelope
+
 ## Core Entities
 - *Not required for Infrastructure design question*
 - It helps to get understanding of what data will be persisited in system and exchanged by the APIs.

@@ -21,6 +21,77 @@
 20. [Design tweet Search](#design-tweet-search)
 
 # URL Shortner
+- Functional Requirements
+    - Generate unique short url for a long URL
+    - Redirects client to the original URL
+    - URL is bound to expiry (Optional)
+- Non Functional Requirements
+    - Scale (Below in BOTE Estimations)
+    - System availability is more important. If created new url is available after some time its fine for us. (availability >> consistency)
+    - 1 Short URL should not be assigned to multiple users/original URLs
+    - Short URLs should not be predictable
+- BOTE Estimations
+    - This is required to know what will be the length of the encoded short url to satisfy scaling requirements
+    - Write: 100M/day = 1000 per second
+    - Read: 100 x Write = 100k per second (Read Heavy System)
+    - Tota storage to store URL for 5 years = 2.5 Kb/url * 100M/day * 5years * 300 days = 450 TB. With Replication -> 3 x 450 TB = 135 PB
+- Core Entities
+    - URL
+- API Design
+    - POST /shorturl/generate { url: xxx , expires_at: timestamp, } -> Response 200 OK
+    - GET https://bit.ly/xUskdhas -> 301 Moved Permamantly to handle redirections by client. 404 in case of invalid/expired URL
+- High Level Design
+    - DB Choice
+        - Considering the amount of data we have we need to partition the data across many nodes and we do need any ACID property of Relational scheme or Joins. So NoSQL DB like DynamoDB or MondoDB is reasonably good choice here since they give *partitioning* out of the box. We can go ahead with MongoDB
+        - Shard data based on shortURL
+    - How to generate short URL ?
+        - Server will handle requests from client and talk to DB. When new tiny needs to be generated KeyGenerationService can be used which can be sepaarte service.
+        - Aproach#1: Random ID generator solution
+            - generate Random ID -> Encode it to Base62 / base52 Encoding
+            - Problems:
+                - High chances of collision with generated URL. We might need to check in DB again to avoid collision
+                - If we want to avoid collisions then co-ordination among server will be required
+        - Approach #2: Twitters snowflake based solution
+            - It generated Id by combining -> timestamp(41 bits) + Data centre ID(6 bits) + worker Id(4 bits) + Sequence No(12 bits)
+            - 64 bit long ID will be generated = 8 characters
+            - Problems
+                - Predictable short URLs
+                - Sequence No will get 12 bits so total of 4096 IDs can be created at specific timestamp in 1 ms by one worker node.
+                - Total no. of max worker nodes allowed = 2^4 = 16
+                - Total no. of max data centres allowed = 2^6 = 64
+                - Combining data centres with machine ids -> we will get 2^10 = 1000 unique machines to generate unique keys
+                - Co-ordinatin and Infrastructure cost is considerable
+        - Approach #3: Hash Function based solution
+            - MD5 hash function can take long URL in input and can generate 128 bit output -> 16 characters long
+            - This can be represented in Base62 Encoding using 22 characters -> 128 bits / 6 bits to represent base 62 = 22 chars
+            - Extract initial 7 characters from hash function
+            - Challenges
+                - Since we are extracting initial 7 characters many URL can have same initial 7 characters in Hash. So high collision
+                - Predicatable output
+        - Approach #4: Token Range 
+            - 
+    - How to handle redirection from Short url to long URL ?
+        - Server receives short URL and is redirected to *Redirection Service*
+        - Redirection service checks mapping from DB to see which one is the original URL along with expiry time.
+        - Upon DB query it returns 301 Redirect response along with original URL in `location` tag of Header
+- Deep Dives
+    - How to scale Read requests ?
+        - We can have a LRU based cache like Redis to avoid hitting DB for popular URL redirections.
+    - How to prevent caching at client side from short url -> long URL ? This will prevent accurate analytics
+        - 301 Response by default caches response at client side
+        - While responding in short URL response set Header as -> `cache-control: public`
+    - What if we want to have 1:1 mapping from long url to short url
+        - Then we will need to check if long url mapping exists in our DB
+        - One way would be to create an index on long url but this would be too expensive.
+        - We can use Bloom Filters here which will say if URL do not exists accurately but when it says it exists then we will need to do DB lookup
+        - Maintaining Bloom can make system but more complex
+    - Concurrency issues in Key generation service or token service
+        - The atomic data structure which is allocating next number for encoding needs to be protected with `Lock` to avoid no 2 concurrent requests picks the same token for further processing.
+    - What happens when multiple clients requests for short url at the same time and requirement is to have 1:1 mapping
+        - Take distributed lock on *long url* before generating short url
+- References
+    - https://systemdesign.one/url-shortening-system-design/
+    - https://www.designgurus.io/blog/url-shortening
 
 # Top K Problem
 
