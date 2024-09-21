@@ -175,3 +175,6 @@ Listing all FileSystem for path: /
 */
 
 ```
+
+# Further Enhancements
+- Add `move` method which will move directory from one path to another path.
