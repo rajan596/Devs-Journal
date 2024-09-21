@@ -8,7 +8,7 @@ Requirements:
 4. Maintain history of previous 20 Meetings for each meeting room.
 
 ```java
-package com.uber;
+package com.lld.practice;
 
 import java.util.HashMap;
 import java.util.Iterator;
