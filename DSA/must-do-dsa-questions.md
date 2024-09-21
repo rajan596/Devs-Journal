@@ -10,6 +10,12 @@
 ## Stack / Queue
 - [Basic Calculator I,II,III](https://leetcode.com/problems/basic-calculator/description/)|Test cases | Medium | Stack |
 
+## Binary Search
+- [Meeting Schedule or My Calender](https://leetcode.com/problems/my-calendar-i)
+    - This teaches a way to keep data in sorted order and do binary search when required using TreeMap
+    - Editorial [Solution](https://leetcode.com/problems/my-calendar-i/editorial/) with TreeMap is worth exploring
+    - [MyCalender II](https://leetcode.com/problems/my-calendar-ii/description/) | [Solution](https://algo.monster/liteproblems/731)
+    
 ## Sliding Window
 - https://leetcode.com/problems/count-subarrays-with-fixed-bounds/
     - Good use of slidinw window technique
