@@ -67,10 +67,6 @@ public enum JobScheduler {
         jobsLock.writeLock().lock();
         jobs.add(job);                   // Critical section
         jobsLock.writeLock().unlock();
-
-//        scheduledJobsLock.lock();
-//        scheduledJobs.add(job);         // Critical section
-//        scheduledJobsLock.unlock();
     }
 
     public void startScheduler() throws InterruptedException {
