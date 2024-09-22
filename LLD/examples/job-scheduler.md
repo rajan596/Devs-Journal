@@ -29,7 +29,7 @@
 - Whenever any Job is added we will need to keep calculate its `startTime` and add it to `PriorityQueue` so jobs are sorted in ASC order of execution time.
 - This problem is `Thread` and `Concurrency` handling heavy.
 - We will need to pass Lambds / Runnable to job so when time comes same can be executed
-- Make sure we create only one JobScheduler across application to avoid creating so many thread pools. We can use `Singleton` to avoid this.
+- Make sure we create only one JobScheduler across application to avoid creating so many thread pools. We can use `Singleton` to avoid this. This has been implemented using enum
 - We will need to have limited thread to execute all scheduled work and it can be configurable like 3 to 10 to avoid any major impact on main thread processing.
 
 # Code
