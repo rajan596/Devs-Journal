@@ -59,7 +59,7 @@ public enum JobScheduler {
 
     JobScheduler() {
         this.jobs = new ArrayList<>();
-        this.scheduledJobs = new PriorityQueue<>((l,r)-> Math.toIntExact(l.nextScheduledTime - r.nextScheduledTime));
+        this.scheduledJobs = new PriorityQueue<>((l, r) -> Math.toIntExact(l.nextScheduledTime - r.nextScheduledTime));
         this.executorService = Executors.newFixedThreadPool(MAX_CONCURRENCY);
     }
 
@@ -68,33 +68,36 @@ public enum JobScheduler {
         jobs.add(job);                   // Critical section
         jobsLock.writeLock().unlock();
 
-        scheduledJobsLock.lock();
-        scheduledJobs.add(job);         // Critical section
-        scheduledJobsLock.unlock();
+//        scheduledJobsLock.lock();
+//        scheduledJobs.add(job);         // Critical section
+//        scheduledJobsLock.unlock();
     }
 
     public void startScheduler() throws InterruptedException {
-        System.out.println("** Job Scheduler Started **");
-        while(true) {
-            if(!executeJob()) { // Execute one job
+        System.out.println(String.format("[%s][%s] ** Job Scheduler Started **", Thread.currentThread().getName(), new Date()));
+        while (true) {
+            if (!executeJob()) { // Execute one job
+//                System.out.println(String.format("[%s][%s] Taking a nap ", Thread.currentThread().getName(), new Date()));
                 Thread.sleep(1000); // If no job executed then sleep for a while 1 Sec is more than enough to check for next timestamp
             }
             rescheduleJobs();
         }
     }
 
-    private boolean executeJob(){
-        long currentTime = System.currentTimeMillis()/1000;
+    private boolean executeJob() {
+        long currentTime = System.currentTimeMillis() / 1000;
         Job jobToExecute;
         try {
             scheduledJobsLock.lock();
 
-            if(!scheduledJobs.isEmpty() && scheduledJobs.peek().nextScheduledTime <= currentTime) {
+            if (!scheduledJobs.isEmpty() && scheduledJobs.peek().nextScheduledTime <= currentTime) {
                 jobToExecute = scheduledJobs.peek();
                 scheduledJobs.remove();
-                executorService.submit(()->{
-                    jobToExecute.setStatus(JobStatus.RUNNING);
+                System.out.printf("[%s][%s] Scheduling Job: %s. Jobs in Queue: %s\n",Thread.currentThread().getName(),new Date(), jobToExecute, scheduledJobs.size());
+                jobToExecute.setStatus(JobStatus.SCHEDULED);
+                executorService.submit(() -> {
                     jobToExecute.runnable.run();
+                    jobToExecute.increaseExecutionCount();
                     jobToExecute.setStatus(JobStatus.NEEDS_SCHEDULING);
                 });
                 return true;
@@ -106,20 +109,22 @@ public enum JobScheduler {
         }
     }
 
-    private void rescheduleJobs(){
+    private void rescheduleJobs() {
         jobsLock.readLock().lock();
-        for(Job job: this.jobs){
-            if(job.getStatus() == JobStatus.NEEDS_SCHEDULING) {
-                if(job.jobType == JobType.RECURRING) {
+        scheduledJobsLock.lock();
+        for (Job job : this.jobs) {
+            if (job.getStatus() == JobStatus.NEEDS_SCHEDULING) {
+                if (job.jobType == JobType.RECURRING || (job.jobType == JobType.ONE_TIME && job.executionCount==0)) {
                     job.updateAndGetNextScheduledTime();
                     job.setStatus(JobStatus.SCHEDULED);
                     scheduledJobs.add(job);
-                } else {
+                } else if(job.jobType == JobType.ONE_TIME && job.executionCount > 0){
                     job.setStatus(JobStatus.EXECUTED);
-                    System.out.println("Job finished execution " + job);
+                    System.out.printf("[%s][%s] Job finished execution: %s\n", Thread.currentThread().getName(), new Date(), job);
                 }
             }
         }
+        scheduledJobsLock.unlock();
         jobsLock.readLock().unlock();
     }
 }
@@ -132,15 +137,19 @@ class Job {
     Runnable runnable;
     long nextScheduledTime; // In epoc
     JobStatus status;
+    String jobName;
+    Integer executionCount; // To maintain how many times job has been executed. Helpful especially for One time Job to mark it as Executed
 
-    public Job(JobType jobType, int initialDelay, int fixedDelay, int fixedInterval, Runnable runnable) {
+    public Job(String jobName,JobType jobType, int initialDelay, int fixedDelay, int fixedInterval, Runnable runnable) {
+        this.jobName = jobName;
         this.jobType = jobType;
         this.initialDelay = initialDelay;
         this.fixedDelay = fixedDelay;
         this.fixedInterval = fixedInterval;
         this.runnable = runnable;
-        this.nextScheduledTime = System.currentTimeMillis()/1000 + initialDelay;
+        this.nextScheduledTime = System.currentTimeMillis() / 1000 + initialDelay;
         this.status = JobStatus.NEEDS_SCHEDULING;
+        this.executionCount = 0;
     }
 
     public JobStatus getStatus() {
@@ -152,13 +161,28 @@ class Job {
     }
 
     public long updateAndGetNextScheduledTime() {
-        if(fixedDelay > 0) {
-            this.nextScheduledTime = System.currentTimeMillis()/1000 + fixedDelay;
-        } else if (fixedInterval > 0){
+        if (fixedDelay > 0) {
+            this.nextScheduledTime = System.currentTimeMillis() / 1000 + fixedDelay;
+        } else if (fixedInterval > 0) {
             this.nextScheduledTime = this.nextScheduledTime + fixedInterval;
         }
         return this.nextScheduledTime;
     }
+
+    public void increaseExecutionCount() {
+        this.executionCount++;
+    }
+
+    @Override
+    public String toString() {
+        return "Job{" +
+                "jobName='" + jobName + '\'' +
+                ", status=" + status +
+                ", executionCount=" + executionCount +
+                ", jobType=" + jobType +
+                '}';
+    }
+
 }
 
 enum JobType {
@@ -174,29 +198,55 @@ enum JobStatus {
     EXECUTED            // Executed all schedules
 }
 
-class CrickerCommentoryPoller implements Runnable{
+class CrickerCommentoryPoller implements Runnable {
     @Override
     public void run() {
-        System.out.println("["+Thread.currentThread().getName() + "] Polling Cricket commentary at time: " + new Date());
+        System.out.printf("[%s][%s] Polling Cricket commentary%n",Thread.currentThread().getName(), new Date());
+    }
+}
+class LatestNewsPoller implements Runnable {
+    @Override
+    public void run() {
+        System.out.printf("[%s][%s] Polling latest news%n",Thread.currentThread().getName(), new Date());
     }
 }
 
 class TestJobScheduler {
     public static void main(String[] args) throws InterruptedException {
         JobScheduler jobScheduler = JobScheduler.INSTANCE;
-        Thread t = new Thread(()-> {
+        Thread t = new Thread(() -> {
             try {
                 jobScheduler.startScheduler();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        }); // To start scheduler in new thread
-        jobScheduler.add(new Job(JobType.ONE_TIME, 4, 0,5, new CrickerCommentoryPoller()));
-        jobScheduler.add(new Job(JobType.RECURRING, 2, 0,5, new CrickerCommentoryPoller()));
+        }); // To start scheduler in new thread to avoid blocking main thread...
+        jobScheduler.add(new Job("OneTimeJob",JobType.ONE_TIME, 10, 0, 5, new CrickerCommentoryPoller()));
+        jobScheduler.add(new Job("RecurringJob",JobType.RECURRING, 3, 0, 5, new LatestNewsPoller()));
         t.start();
         t.join();
     }
 }
+
+```
+
+# Output
+
+```bash
+[Thread-0][Sun Sep 22 14:51:14 IST 2024] ** Job Scheduler Started **
+[Thread-0][Sun Sep 22 14:51:22 IST 2024] Scheduling Job: Job{jobName='RecurringJob', status=SCHEDULED, executionCount=0, jobType=RECURRING}. Jobs in Queue: 1
+[pool-1-thread-1][Sun Sep 22 14:51:22 IST 2024] Polling latest news
+[Thread-0][Sun Sep 22 14:51:27 IST 2024] Scheduling Job: Job{jobName='RecurringJob', status=SCHEDULED, executionCount=1, jobType=RECURRING}. Jobs in Queue: 1
+[pool-1-thread-2][Sun Sep 22 14:51:27 IST 2024] Polling latest news
+[Thread-0][Sun Sep 22 14:51:29 IST 2024] Scheduling Job: Job{jobName='OneTimeJob', status=SCHEDULED, executionCount=0, jobType=ONE_TIME}. Jobs in Queue: 1
+[pool-1-thread-3][Sun Sep 22 14:51:29 IST 2024] Polling Cricket commentary
+[Thread-0][Sun Sep 22 14:51:30 IST 2024] Job finished execution: Job{jobName='OneTimeJob', status=EXECUTED, executionCount=1, jobType=ONE_TIME}
+[Thread-0][Sun Sep 22 14:51:32 IST 2024] Scheduling Job: Job{jobName='RecurringJob', status=SCHEDULED, executionCount=2, jobType=RECURRING}. Jobs in Queue: 0
+[pool-1-thread-1][Sun Sep 22 14:51:32 IST 2024] Polling latest news
+[Thread-0][Sun Sep 22 14:51:37 IST 2024] Scheduling Job: Job{jobName='RecurringJob', status=SCHEDULED, executionCount=3, jobType=RECURRING}. Jobs in Queue: 0
+[pool-1-thread-2][Sun Sep 22 14:51:37 IST 2024] Polling latest news
+[Thread-0][Sun Sep 22 14:51:42 IST 2024] Scheduling Job: Job{jobName='RecurringJob', status=SCHEDULED, executionCount=4, jobType=RECURRING}. Jobs in Queue: 0
+[pool-1-thread-3][Sun Sep 22 14:51:42 IST 2024] Polling latest news
 
 ```
 
