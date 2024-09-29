@@ -19,6 +19,7 @@
 18. [Design Yelp](#design-yelp)
 19. [Design Tinder](#design-tinder)
 20. [Design tweet Search](#design-tweet-search)
+21. [Stock Price Alert system](#stock-price-alert-system)
 
 # URL Shortner
 - Functional Requirements
@@ -94,8 +95,18 @@
     - https://www.designgurus.io/blog/url-shortening
 
 # Top K Problem
-
 **Problem:** Find Top K most viwed videos, Trending songs etc
+- Functional Requirements
+    - Find Top K viewed videos from last 1 min, 5 min, 1 Hour
+- Non Functional Requirements
+    - API latency should be as low as possible
+    - System should be highly available and 100% consistency accuracy is not required
+- Entities
+    - Top K Videos (or any other content like tweet/post)
+- API Schema
+    - GET /v1/top-videoes?type={1min|5hr|5min|1hr}
+- High Level Design
+- Deep Dives
 
 **References:**
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/top-k)
@@ -816,6 +827,116 @@ References:
         - Re-use search result cache with timestamp. Maintain cache sorted chronological order. Get next N results from cache with timestamp < input timestamp
 - References
     - https://www.hellointerview.com/learn/system-design/answer-keys/tweet-search
+
+# Stock Price Alert system
+- Problem Statement: Design a system in which user is subscribing to some stocks from list of stocks. User will set some rules on basis of which if the rules are broken we have to sent notificaiton to user. For eg: let say user have subscribed to uber stock and set rule that if stock price goes above 60$ send me notification.
+- Functional Requirements
+    - User should be able to set alert on specific stock.
+    - Alert criteria can be %x down, %x up, x up, x down
+    - User should receive notification when stock touches mentioned criteria
+- Non Functional Requirements
+    - Notification should be in realtime i.e low latency. Getting notification after certain minutes might not make much sense
+    - System should be able to handle massive alert conditions setup by all users and send notification
+    - System should consider availability for alerting service than consistency
+    - Across Stock price changes happens 20M times a day. ~600/second consideting 8 Hour trading window
+- Out of Scope
+    - Capping 50 notification/user/day to avoid notification bombarding and manage system effectively
+- Entities
+    - Stock (Scrip)
+    - Stock Price Change (Tick)
+    - Notification
+    - User
+- API Scheme
+    - POST /stocks/alert { stock : "AAPL", currentPrice: 120, alertPrice: 140}
+- High Level Design
+    - User facing service to have CRUD operations on Stock alerting DB
+        - We need to maintain data like { user_id, stock , target_price, status = { Not Triggered | Triggered }, triggered_at: timestamp}
+        - Which DB we will use ?
+            - Paytm Money uses Elastic search to maintain alert data and Query to get eligible alert based on criteria.
+    - Stock Price Update service
+        - We need to have a service which will get data from Stock market for any price variation change
+        - This can be notification based service OR we will need to have poller if first one is not possible
+    - Alert trigger service
+        - Get data from Stock Price update service, query in Alerts DB find eligible users to send alert to and send message in queue to notification service
+    - Notification service
+        - Have one Queue based consumer to consume data from alert trigger service
+        - based on payload send notification to user
+    - Making sure no alert is triggered twice
+        - Maintain Distributed cache like Redis with certain TTL to avoid duplicate notification
+- Deep Dives
+    - How to handle Out of Order price updates in Alert trigger service
+        - Its possible that multiple consumer of Alert trigger service might receive the price update for same stock and latest one gets processed early.
+        - To handle this we will need to make We send all the price updates in the same queue and only consumer will be assigned certain queue to consume from so no 2 consumer can consume data for the same stock
+    - Concurrency Issues
+        - When price tick comes and alert is triggered but before writing to DB or before data gets repicated among shards new price comes which can also trigger alert.
+        - This is handled using distributed cache with small TTL
+- References
+    - https://www.paytmmoney.com/blog/how-we-built-an-in-house-price-alerts-system/
+
+# Design Whatsapp
+- Functional Requirements
+    - Enable individual messaging
+    - Enable Group messaging
+    - Send and receive Media
+    - User should be able to receve messages when they come online
+- Non Functional Requirements
+    - Message should reach in real-time if user is online
+    - Billions of messages - Scalability aspect
+    - Guarenteed delivery of messages
+    - Message should be deleted from central server after some period than necessary
+- Core Entities
+    - User
+    - Group
+    - Message
+    - Media
+    - Client [ User devices]
+- API Design
+    - We can consider using bidirectional comm protocol like WebSocket
+    - Messages from Client
+        - CreateChat
+        - SendMessage
+        - CreateAttachment
+        - ModifyParticipant
+    - Messages received
+        - NewMessage
+        - ChatUpdate
+- High level design
+    - Message delivery to user (Durable)
+        - Client needs to connect to Chat Server which will hold websocket connections
+        - Client will send message to server lets say { event_type: "message", "content": "Hey" , from: user_a ,chat_id: 1234, timestamp: 13443 }
+        - Server will receive this message and store in DB for durability in `messages` table. It will then fetch all the participants from `chat_participants` table in this chat whom message needs to be sent. 
+        - It can make entry in `events` DB for { from_user, to_user, message_id, timestamp, status }
+        - Client can poll -> server can query in DB to see any message is there for client user and sent it back and update status in events table.
+    - Realtime delivery
+        - Above solution was polling based and it wont be realtime
+        - Since all the users are connected to Chat Server, whenever any new message comes Chat server can keep and Hash of user -> websocket connection and can imemediately deliver any message to user.
+        - If user is offline then just add message in DB and when client reconnects it will get all of the messages
+        - We will need to solve Single Node Chat server issue as its a single point of failure and cant handle connection more then certain limit
+    - Media attachments
+        - If we pass attachments via Chat server it will utilise network bandwidth unnecessarily
+        - Good approach would be to Send presigned URL to Client for any media attachment, client will then upload data there and server will keep track of just URL
+        - Client will then be able to download attchment directly from Blob storage. No need to communicate via Chat Servers for any attachmnt data
+- Deep dives
+    - How to handle large number of users online at the same time ?
+        - We will need to make Chat server scalable and do horizontal scaling there
+        - If we have 200m users active at the same time and 1 node can handle 1m connections then we will need ~200 nodes or machines
+        - Sol 1: If we create kafka topic per user and chat server subscribes to those topic -> this will create millions of topic and wont be practicle and efficient
+        - Sol 2: Maintan owners of user websocket connection on Zookeeper. When CHarServer A recognizes need for sending message to user_b on node_b it will make connection to that node and send the data. But this will create all nodes to maintain connection with all other nodes
+        - Sol 3: Use Redis Pub/Sub
+            - It gives *at most once* delivery guarentee
+            - When new events are created Char server will send destination user message in user_b specific Redis `topic`. 
+            - A Good Load balancer algorithm here would be - Least connection
+            - This will add additional latency as now messages are going via Redis system
+    - Optimise chat lookup
+        - We are querying DB everytime we need to know all the participatns of chat
+        - We can cache this information in LRU based cache and update cache in case of any update in participants list
+    - How to handle High Database write throuput
+        - Since we have 1b users and storing messages for all of the users until delivered will require good number of DB throuput and storage
+        - We need approx 100k - 300k writes/second throuput considering 1b users create 10 messages per day and sends to 3 people in a 100k seconds a day
+        - Shard/partition data based on geographical location
+    - How to handle multiple clients for a given user ?
+        - We need to now maintain data based on client level rather than user level
+        - this will increase data footprint drastically
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

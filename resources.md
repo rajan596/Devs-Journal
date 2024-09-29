@@ -1,8 +1,8 @@
 # Engineering Blogs of Tech companies
 
 - [PhonePe](https://tech.phonepe.com/)
-- [Uber Engineering]()
-- [Netflix]
+- [Uber Engineering](https://www.uber.com/en-IN/blog)
+- [Netflix]()
 
 # Youtube Channels
 

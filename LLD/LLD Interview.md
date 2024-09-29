@@ -13,7 +13,7 @@
 - We need to mention important method of our entities
 - Write Production grade code
 - Data Flow Discussion : Try simulating how Classed together with using methods of each other fulfill the required functionality.
-- Discuss concurrency issues if it can happen
+- Discuss `concurrency` issues if it can happen. This is very important at Senior level
 - Try to find If Design pattern can be used here and name the Design pattern. Brush up Design patterns before going to LLD Interview
 - Design keeping SOLID principles in mind
 

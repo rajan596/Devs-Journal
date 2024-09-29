@@ -288,6 +288,8 @@ data: GOAL Manchester United 3 - 3 Manchester City
 - References:
   - https://systemdesign.one/consistent-hashing-explained/
   - https://www.youtube.com/watch?v=UF9Iqmg94tk
+  - https://arpitbhayani.me/blogs/consistent-hashing/
+  - [Python Implementation](https://github.com/arpitbbhayani/consistent-hashing/blob/master/consistent-hashing.ipynb)
 
 # Replication
 
