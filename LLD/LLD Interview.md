@@ -48,3 +48,6 @@ An example of a Possible LLD flow
 
 ## Design Thread Pool like ExecutorService in Java
 
+# References
+- https://github.com/kumaransg/LLD/blob/main/README.md
+- https://github.com/prasadgujar/low-level-design-primer/blob/master/solutions.md

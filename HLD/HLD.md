@@ -188,8 +188,8 @@ Use case for Document DB..
   - Quorum: configurable consistency when having multiple nodes
     - R + W > N --> To ensure strong consistency
     - R + W <= N --> Eventual consistency
-- Thundering Herd
-  - 
+- For large file uploads from client device, preferrable approach is to request presigned url from server and client directly upload data in chunks to server avoiding data passthrough from application servers.
+  - Store chunks in temp storage and once all the chunks are uploaded combine and move them to permanant storage as a single file.
 
 # Polling techniques
 
@@ -561,8 +561,6 @@ OK
 (integer) 6
 ```
 
-# Bloom Filter
-
 # Write Ahead Logs
 
 - Before we make changes to actual data file Log those changes in separate file in sync mode.
@@ -604,6 +602,18 @@ OK
 
 - Offset based
 - Cursor based
+
+# Probabilistic Data Structures
+
+## Count Min Sketch Data Structure
+- It is a probabilistic data structure
+- It will not give accurate result but will give result with bounded error
+- It has 2D grid and initial values as zero. Higher accuracy requires larger memory footprints
+- N rows means we will use N hash functions and map the value withing columns range and increments matrix[row][col] count
+- There can be collisions i.e, A and C can map to same value for row1 then it will contain count of A + C
+- To get approximate value We will need to consider Min count of A from the grid.
+- This just stores only counts and can be replacement of ever increasing hash map, but we will still need to keep track of interested keys with us.
+- References: https://ravisystemdesign.substack.com/p/interview-preparation-design-a-system
 
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**

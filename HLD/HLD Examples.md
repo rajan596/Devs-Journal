@@ -2,7 +2,7 @@
 1. [URL Shortner](#url-shortner)
 2. [Top K Problem](#top-k-problem)
 3. [Location Tracking](#location-tracking-system)
-4. [Video streaming](#video-streaming--chat-app)
+4. [Design Youtube](#design-youtube)
 5. [Design LeetCode](#design-leetcode)
 6. [Rate Limiter](#rate-limiter)
 7. [Distributed Job Scheduler](#distributed-scheduler)
@@ -101,15 +101,51 @@
 - Non Functional Requirements
     - API latency should be as low as possible
     - System should be highly available and 100% consistency accuracy is not required
+- Questions to ask Interviewer
+    - Is top k items required to be avalable within seconds ? This will decide the direction of interview and system design
+    - Do we need accurate or Approximate results ?
 - Entities
     - Top K Videos (or any other content like tweet/post)
 - API Schema
-    - GET /v1/top-videoes?type={1min|5hr|5min|1hr}
+    - GET /v1/top-videoes?window={1min|5hr|5min|1hr}
 - High Level Design
+    - We will start with a simple solution and incrementally increase the complexity to satisfy Non-Functional requirements
+    - *Solution 1*
+        - Maintain data in single node in-memory and use Heap to maintain top K elements
+        - Single Host will only work if all the data can fit into memory and as flow of data grows single host wont be able to keep it up with it and can be bottleneck.
+        - Single host will also be Single Point of Failure
+        - Lets look at improved version in Solution 2
+    - *Solution 2*
+        - Adding a load balancer and having multiple Machines behind it.
+        - All the data will be merged in a different Storage Host
+        - Problem: Storage and processing host is still bottleneck in-terms if the memory
+    - *Solution 3*
+        - Earlier a single video data can go to any machine so multiple machines have count associated with video_a
+        - We will need to do **Data Partitioning**. We need to assign segments of videos to different hosts so single all hosts will have only subset of video data
+        - Then Storage Host can combine Top K list from each of the available host and can find Top K List using Merge Sorted List method
+        - Problem: If any node goes down then data is lost. Durability issues
+        - *Data Replication*: In-order to avoid data loss we can replicate one node's data to 2 other nodes. One node will act as primary and other 2 nodes will act as secondary.
+        - *Rebalancing:*  What happens when any node is added or deleted ?
+            - We will need to move data to new node from existing nodes or move data from node being deleted to existing nodes.
+            - Data partitioner node should maintain meta data regarding partitioning like processing nodes, data ranges, etc
+        - *Hot partition* : One/some of the node be heavily loaded because of some viral video
 - Deep Dives
-
-**References:**
-- [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/top-k)
+    - How can have a Solution with bounded memory ? *Count Min Sketch Data Structure*
+        - This is a Probabilistic data structure. It may not give accurate result but will give with bounded error.
+        - Further details can be found within thie repo. Search - *Count Min Sketch*
+        - We will still need to keep track of top K keys based on count present in Count Min sketch.
+        - This way we got rid of ever increasing hash map
+        - When we use Count Min Sketch then we can store all the data in a single machine and we can have standby replicas to avoid single point of failure and have High availability. Now we dont need multiple servers to partition data across.
+    - How can we have accurate results with some additional delay
+        - Here we can partition data based on [video_id + timestamp window] to based partition in Kafka.
+        - Partition Processor will then consume data from specific partition and aggregate in-memory for some time and then flush it on distrubited file system like S3 or HDFS
+        - Then we can run a MapReduce job on top of this to calculate final frequency of all videoes for different time diration say 10 Min, 1 Hr, 1 Day
+        - TopK MapReduce job can then run and find top K elements and store it in some persisitent storage layer
+        - ![alt text](./assets/top-k-arch.png)
+- References
+    - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/top-k)
+    - https://ravisystemdesign.substack.com/p/interview-preparation-design-a-system (Good In-Depth Content)
+    - [System Design Interview - Top K Problem (Heavy Hitters) Youtube](https://www.youtube.com/watch?v=kx-XDoPjoHw)
 
 # Location Tracking System
 
@@ -137,15 +173,65 @@ References:
     - Less good when we have uneven distibution of density
     - **Good when we have high frequrency updates**
 
-# Video Streaming / Chat App
-
-- Selection on Communication Protocol
-    - HTTP / HTTP Long Polling: 
-        - Single Directional Protocol
-        - TCP conn terminates upon response. 
-        - Overhead of TCP conn creation and termination
-    - WebSocket: 
-        - Bi-directional comm protocol
+# Design Youtube
+- Functional Requirements
+    - User should be upload video
+    - User should be able to view any video
+- Non Functional Requirements
+    - System should be highly available
+    - System should support billions of videos
+    - Streaming latency should be minimul. Avoid any buffer experience
+    - System should support uploading big videoes i.e, in GBs and support resumable uploads
+- Entities
+    - Video
+    - Video Meta data
+    - User
+    - Upload | Stream/Download
+- APIs
+    - Upload: POST /upload {Video, VideoMetaData}
+        - Directly upload to S3: POST /{pre-signed-url}
+    - Download: GET /videos/:videoId -> {Video, VideoMetaData}
+- Fundamental Concepts 
+    - Video Codec: Encoding-Decoding of Video to reduce its size which makes efficient storage and transmission. Examples - H.264, Mpeg-4
+    - Video Container: File format which stores video, video meta data. Can vary based on platform/OS
+    - Bitrate: No. of bits transmitted over a period of time. Typically measured in kbps or mbps
+    - Manifest file: Maintains list of all available video formats with resolution and its chunk URLs
+- High level Design
+    - Upload Video
+        - Store Video meta data : Since we need to store large number of videos and its meta data we will need a storage layer which can scale horizontally. Here any DB which supports partitions like Cassandra can work well. Partition can be based on `videoId`
+        - Upload video in chunks to S3 with pre-signed urls received from app servers
+        - This completed video upload process
+    - Video Upload Post Processing
+        - User cant stream raw video uploaded to our S3. 
+        - Different devices support different media formats and depending on network bandwidth available we may need to serve video with different resolution. So we will have (Media formats) x (Resoutions supported) combinations to process with
+        - We also need to consider user wont be downloading whole file but will access chunk of a file at a time. So we need to divide video in segments and then store it along with its segment details in Video Meta Data
+    - Stream Video
+        - User can fetch VideoMetaData from sever which has all the information about all the segments and resolutions
+        - Client would be requesting video segments incrementally based on media supported and bandwidth
+        - **Adaptive Bitrate streaming**
+            - Client will download menifest file containing all urls for all types of video segments
+            - Based on user setting client will start loading segments from S3 to device
+            - When client experiences poor or better network client can switch automatically to get improved or lowered resolution video segments
+- Deep Dives
+    - Post Processing Part once video is uploaded
+        - Once video is uploaded successfully, then we will need to generate combinations of different transcodings. This is CPU bound work. Each video segment will be processed in different formats.
+        - This work will be assigned to transcoding workers who will transcode and upload it to S3 each segments and update menifest file with segment -> URL details.
+    - Resumable Uploads
+        - Client will divide video into chunks say 5 mb
+        - VideoMetaData would contains details of chunk - { fingerprint, status: NotUpoaded }
+        - Client would upload each chunk to S3
+        - S3 can fire event for successful chunk upload and DB can update chunk status to Uploaded
+        - If client want to pause and resume then it can Get details from server/local DB to see which chunks are pending and resume uploading
+- References
+    - https://www.hellointerview.com/learn/system-design/answer-keys/youtube
+- Notes
+    - Selection on Communication Protocol
+        - HTTP / HTTP Long Polling: 
+            - Single Directional Protocol
+            - TCP conn terminates upon response. 
+            - Overhead of TCP conn creation and termination
+        - WebSocket: 
+            - Bi-directional comm protocol
 
 # Design LeetCode
 - In this case user is submitting code which we need to execute. For this scenasio we can run code on our main servers. It needs **Isolated** execution to address Security concerns.
