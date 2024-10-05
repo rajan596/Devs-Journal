@@ -603,6 +603,17 @@ OK
 - Offset based
 - Cursor based
 
+# Concensus Algorithms
+
+## Raft
+- Allows leader election capability in distributed systems 
+- References
+  - https://medium.com/@jitenderkmr/understanding-raft-algorithm-consensus-and-leader-election-explained-faadf28fd047
+
+## Paxos
+- Used by Apache Zookeeper, Google chubby
+- For getting consensus from > n/2 members
+
 # Probabilistic Data Structures
 
 ## Count Min Sketch Data Structure
@@ -614,6 +625,27 @@ OK
 - To get approximate value We will need to consider Min count of A from the grid.
 - This just stores only counts and can be replacement of ever increasing hash map, but we will still need to keep track of interested keys with us.
 - References: https://ravisystemdesign.substack.com/p/interview-preparation-design-a-system
+
+# Conflict Resolutions
+
+## Vector Clock
+- Each server maitains vector clock of [{Server}:{Counter}]
+- Server A receives updates and maintains [(A:1),(A,2),(A,3)] which indicates A has recent version 3
+- Same data is replicated to server B as [(A:1),(A,2),(A,3)]
+- Now if network partition occurs and A and B both receives new update to key A then vector clock will look like this
+  - With server A: [(A:1),(A,2),(A,3),(A,4)]
+  - With server B: [(A:1),(A,2),(A,3),(B,1)]
+  - Here its dificult to decide which one is newer or latest update (A,4) or (B,1)
+- In this scenarios vector clock is sent to client to resolve the conflict and then accordingly data is updated
+- Result will be 
+  - With server A: [(A:1),(A,2),(A,3),(A,4),(A,5)]
+  - With server B: [(A:1),(A,2),(A,3),(B,1),(A,5)]
+  - (A,5) will hold the value resolved by client
+- This can be assumed similar to Git merge conflicts where user needs to resolve manually
+
+## LWW - Latest Write wins
+- Write with latest timestamp is overriden by server.
+- Chances of data loss if concurrent update happens to update same key
 
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**

@@ -1,6 +1,6 @@
 # Introduction
+- It was built by Facebook in 2007 to supports its Rapidly growing inbox search feature
 - Cassandra is NoSQL Column Oriented Data store.
-- It was built by Facebook to supports its Rapidly growing inbox search feature
 - Open source, distributed NoSQL DB
 - Wide column database : Not all col is required to be present for all the rows
 - Eventual consistenty model
@@ -9,16 +9,27 @@
 - Does not support Transactions
 - LSM Tree bases storage structure
 - Cassandra does not have a concept of Foreign keys / relations. Doesn't favour normalisation.
+- Performance can scale linearly with addition of nodes
+- Combines distributed nature of Amazon's Dynamo and Column bases data store nature of Google's Big table
+- Cassandra follows `leaderless architecture` avoiding any single point of failure
+
+# Use cases
+- **Store key value data** with high availability. Reddit uses Cassandra as persistent layer
+- **Time series data model**
+- **Write heavy application**
 
 # Entities in Cassandra
 - KeySpace: Equivalent to database in relational world
 - Table
 - Row
 - Column
+    - Cassandra do not store column with NULL value. This saves a lot of space.
 
-# Important Points
-- Partition Key: One or more columns used to decide which partition new data row will belong
-- Clustering Key: Zero or more column Used for Sort order (Can consider this as sort key)
+# Cassandra Keys
+- Primary Key = Partition Key + Clustering Key
+- Partition Key: One or more columns used to decide which partition new data row will belong (Decides how data is distributed)
+- Clustering Key: Zero or more column Used for Sort order (Can consider this as sort key) (Decides How data is stored within node)
+- By default cassandra uses Murmur3 hash function to generate Hash from given input data to generate partition key
 
 # Partitioning
 - Cassandra achieves horizontal scaling by partitioning data across multiple machines

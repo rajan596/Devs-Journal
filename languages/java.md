@@ -360,6 +360,36 @@ Can be used for async tasks. Simply put them in future and then get the result u
 While calling get() method it blocks the flow and wait for the task to complete and then returns the result.
 Future can be cancelled.
 
+# Blocking Queue in Java
+
+- Use cases: Buffer storage with fixed capacity limit
+- Can be used in multi threaded environment
+
+```java
+BlockingQueue<String> logBuffer = new LinkedBlockingQueue<>(20); // Can be initialized with buffer size
+
+/*
+Returns true: If capacity is not full, otherwise false
+
+Java Doc:
+Inserts the specified element at the tail of this queue if it is possible to do so immediately without exceeding the queue's capacity, returning true upon success and false if this queue is full. When using a capacity-restricted queue, this method is generally preferable to method add, which can fail to insert an element only by throwing an exception.
+Throws:
+NullPointerException – if the specified element is null
+
+*/
+Boolean logAdded = this.logBuffer.offer(message);
+
+// Implementation: 
+![alt text](./assets/blocking-queue-offer.png)
+/*
+take(): Returns an object when queue has data. If queue is empty it will put thread in sleep and once data is available take will return the data.
+This avoids busy waiting and reduces CPU cycle and resource usage consumption
+*/
+String logMessage = this.logBuffer.take();
+
+![alt text](./assets/blocking-queue-take.png)
+```
+
 # Multi Threading in Java
 
 - Process: Program under execution (loaded in memory). Program resides in disk.

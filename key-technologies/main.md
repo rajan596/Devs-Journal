@@ -140,6 +140,27 @@ Isolation: How 2 parallel transaction can affect each other. 2 Transactions are 
 - #NoSQL #ACID
 - Cassandra compatible DB written in C++
 
+# Merkle Tree
+- Its a binary tree of hashes.
+- Each intermediate node contains hash of 2 child hash and leaf node contains hash of specific data partition range.
+- Use: To compare the replication or data difference between 2 nodes's data
+- Comparing hash is easier to locate which part is not synced rather than matching compelte data which can be a costly task
+- Advantages: Recues data transfer to check for synchronization
+- Disadvantages: need to recalculate merkle tree when any new node joins or leaves and partition re-distribution happens
+
+![alt text](./assets/merkle-tree.png)
+
+# Gossip Protocol
+- Helps when in a system there is no central node to keep track of system health
+- Hepls all nodes to be aware about all other nodes regarding system state and if any node is down
+    - Like which nodes are available
+    - Key range for each partition and node assigned
+- Its a Peer to Peer communication protocol
+- Every second each node sends information to one random node about node itself and information it has of other nodes
+- This way eventually node state will be informed to everyone
+- Some times this can result in Logical Partitioning. i.e, Some nodes are yet not aware of Ring state. To handle this certain seed nodes are configured. Every node can talk to seed node to reconsile ring state
+- 
+
 # Notes
 
 - **Partital Indexes** : [YT: Partitial Index](https://www.youtube.com/watch?v=CA2_0ZhVW2g)
