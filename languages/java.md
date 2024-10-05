@@ -380,16 +380,17 @@ NullPointerException – if the specified element is null
 Boolean logAdded = this.logBuffer.offer(message);
 
 // Implementation: 
-![alt text](./assets/blocking-queue-offer.png)
+
 /*
 take(): Returns an object when queue has data. If queue is empty it will put thread in sleep and once data is available take will return the data.
 This avoids busy waiting and reduces CPU cycle and resource usage consumption
 */
 String logMessage = this.logBuffer.take();
 
-![alt text](./assets/blocking-queue-take.png)
 ```
 
+![alt text](./assets/blocking-queue-offer.png)
+![alt text](./assets/blocking-queue-take.png)
 # Multi Threading in Java
 
 - Process: Program under execution (loaded in memory). Program resides in disk.
