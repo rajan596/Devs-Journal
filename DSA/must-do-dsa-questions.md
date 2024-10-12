@@ -15,11 +15,15 @@
     - This teaches a way to keep data in sorted order and do binary search when required using TreeMap
     - Editorial [Solution](https://leetcode.com/problems/my-calendar-i/editorial/) with TreeMap is worth exploring
     - [MyCalender II](https://leetcode.com/problems/my-calendar-ii/description/) | [Solution](https://algo.monster/liteproblems/731)
-    
+- [Median of two sorted arrays](https://leetcode.com/problems/median-of-two-sorted-arrays)
+    - Arrays are sorted so Binary search comes to mind. But on what basis we need to do binary search ?
+    - We need to pick some elements from arr1 and some from arr2 such that their element count is ~ n/2
+    - If we pick x elements from arr1 then from second arr2 n/2-x elements can be picked. We need to find a point where we can form a valid first half based on partition point in arr1 and arr2
+    - Solution: Follow this [Link](./assets/median-of-two-sorted-arr.png)
 ## Sliding Window
 - https://leetcode.com/problems/count-subarrays-with-fixed-bounds/
     - Good use of slidinw window technique
-    - Hard : Difficulty level
+    - Hard : Difficulty level 
 
 ## Greedy
 - Minimise & Reach farthest: [Video Stitching](https://leetcode.com/problems/video-stitching/description/) | [Jump Game II](https://leetcode.com/problems/jump-game-ii/description/) | [Min no of tapes to water garden](https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/description/)

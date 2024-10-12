@@ -1,4 +1,3 @@
-# Problem Statement - Design a multithreaded job scheduler
 
 - User should be able to schedule Jobs..
     - One time Job with initial delay
@@ -248,4 +247,5 @@ class TestJobScheduler {
 
 # Resources
 - https://www.youtube.com/watch?v=l6uKzV7yZzM
+
 
