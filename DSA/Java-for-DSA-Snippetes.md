@@ -1,4 +1,4 @@
-# Java
+# Java for DSA 
 
 Noting down important syntax in Java to solve DSA problems
 
@@ -127,6 +127,13 @@ for (Integer value : mp.values()){ } // iterate over values
 - log(N) operations for add/remove/get
 
 ```java
+TreeMap<Integer, Node> mp = new TreeMap<>((l,r) -> l - r); // Sorts key in ASC order
+
+Integer lowestKey =  mp.firstKey();
+Integer highestKey = mp.lastKey();
+
+Integer x = mp.lowerKey(8); // 6 
+Integer y = mp.higherKey(9); // 10
 
 ```
 
@@ -178,6 +185,24 @@ public class TreeSetExample {
 }
 ```
 
+### LinkedHashSet
+- A LinkedHashSet is a HashSet-LinkedList hybrid. Like a HashSet, items can be found, updated, added, and removed in O(1) time. In addition, it puts links between the entries to keep track of the order they were added. Whenever an item is removed from the LinkedHashSet, the links are updated to point to the previous and next, just like they are in an ordinary LinkedList.
+- Usecase: Really helpful when `ordered data like queue` needs to be maintained with `random node deletion` in-between the queue. `Set + LinkedList`
+
+```java
+Set<Integer> setQueue = new LinkedHashSet<>();
+
+// Adds value in O(1)
+setQueue.add(value);
+
+// Removes value in O(1)
+setQueue.remove(value);
+
+// Finds first value in O(1)
+setQueue.iterator().next();
+```
+
+
 ## Stack in Java
 
 ```java
@@ -186,6 +211,10 @@ stack.push(12);
 Integer topElement =  stack.pop();
 Integer element = (Integer) stack.peek(); // It does not delete element
 ```
+
+# DSA
+
+## Stack
 
 ### Monotonic stack 
 
@@ -890,7 +919,7 @@ class Solution {
 }
 ```
 
-## Topological Sort
+### Topological Sort
 
 ```java
 /**** USING BFS *****/
@@ -1132,17 +1161,103 @@ class Solution {
 https://amortizedminds.wordpress.com/2015/07/18/merge-sort-algorithm/
 https://amortizedminds.wordpress.com/2015/07/19/counting-inversion-spoj-invcnt/
 
-## nCr % m
-
-https://amortizedminds.wordpress.com/2015/07/02/ncr-m/
-
-## Patterns
-
-
-### Sliding Window
+## Sliding Window
 - Questions generally says find the count of sub arrays following certain properties
 - Solution in N*N is generally not acceptable.
 - Examples
     - https://leetcode.com/problems/count-subarrays-with-fixed-bounds/ [Hard]
-    - 
-    
+
+## Maths
+
+### GCD and LCM
+- GCD: Greatest Common Divisor
+
+```java
+GCD(10,15) = 5
+
+// naive Approch
+public int gcd(int a, int b){
+    for(int i=Math.min(a,b);i>=1;i--){
+        if(a%i == 0 && b%i==0) return i;
+    }
+}
+
+// Euclidean algorothm
+// gcd(a,b) = gcd(a-b,b) where a>b
+// gcd(a,0) = a
+// More optimised form. Reason: We will be subtracting b from a until it becomes less than b means we are doing y = a - i*b operations until y < b. Its equivalent to finding mod of a%b
+// Here it goes....
+// gcd(a,b) = gcd(a%b, b) where a > b
+
+public int gcd(int a, int b) {
+    if(b == 0) return a;
+    return a > b ? gcd(a%b, b) : gcd(b%a,a); 
+}
+
+public int lcm(int a,int b) {
+    return a*b/gcd(a,b);
+}
+```
+
+### All Divisors of a number
+```java
+    public static void divisors(int N){
+        for(int i=1;i<=Math.sqrt(N);i++){
+            if(N%i==0) {
+                // i is one of the divisor
+                if(i*i != N) // N/i is one of the divisor;
+            }
+        }
+        return sum;
+    }
+```
+
+### Prime number
+- A number who has 2 fators 1 & number itself
+```java
+    public static int isPrime(int N){
+        if(N == 1) return false;
+        for(int i=2;i*i<=N;i++){
+            if(N%i == 0) {
+                // i is one of the divisor
+                return false;
+            }
+        }
+        return true;
+    }
+```
+- Use SieveOfEratosthenes to find prime numbers till N
+```java
+    void sieveOfEratosthenes(int n)
+    {
+        // Create a boolean array "prime[0..n]" and
+        // initialize all entries it as true. A value in
+        // prime[i] will finally be false if i is Not a
+        // prime, else true.
+        boolean prime[] = new boolean[n + 1];
+        for (int i = 0; i <= n; i++)
+            prime[i] = true;
+
+        for (int p = 2; p * p <= n; p++) {
+            // If prime[p] is not changed, then it is a
+            // prime
+            if (prime[p] == true) {
+                // Update all multiples of p greater than or
+                // equal to the square of it numbers which
+                // are multiple of p and are less than p^2
+                // are already been marked.
+                for (int i = p * p; i <= n; i += p)
+                    prime[i] = false;
+            }
+        }
+
+        // Print all prime numbers
+        for (int i = 2; i <= n; i++) {
+            if (prime[i] == true)
+                System.out.print(i + " ");
+        }
+    }
+```
+
+### nCr % m
+https://amortizedminds.wordpress.com/2015/07/02/ncr-m/

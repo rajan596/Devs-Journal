@@ -172,6 +172,7 @@ References:
         - One of the approach to store the data is to partition data based on Consistent Hashing
     - Less good when we have uneven distibution of density
     - **Good when we have high frequrency updates**
+    - Implementation example: https://www.movable-type.co.uk/scripts/geohash.html
 
 # Design Youtube
 - Functional Requirements
