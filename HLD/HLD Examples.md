@@ -20,6 +20,7 @@
 19. [Design Tinder](#design-tinder)
 20. [Design tweet Search](#design-tweet-search)
 21. [Stock Price Alert system](#stock-price-alert-system)
+22. [Colloborative document editing tool like Google Doc](#colloborative-document-editing-tool-like-google-doc)
 
 # URL Shortner
 - Functional Requirements
@@ -1024,6 +1025,35 @@ References:
     - How to handle multiple clients for a given user ?
         - We need to now maintain data based on client level rather than user level
         - this will increase data footprint drastically
+
+# Colloborative Document editing tool like Google Doc
+- Functional Requirements
+    - CRUD operations on document
+    - Multiple editors should be able to colloborate in real time concurrently
+    - Colloborative editing with conflict resolution (focus area)
+    - Cursor position of user
+- Non Functional Requirements
+    - Sub milli second latency
+    - Upto 100 concurrent editors per document
+    - millions of documents with millions of users
+- Core Entities
+    - Client
+    - API Server
+    - Storage Engine
+- API Design
+    - Since real time colloboration is required we need `persistent connection`. Can be using WebSockets
+    - Create document POST /api/documents
+    - Read document GET /api/documents/{docid}
+    - Update document meta data PUT /api/documents/{docid}
+    - WS /api/documents/{docid}/collaborate
+
+- High level design
+    - Real time colloboration
+        - The two main approaches are Operational Transformation (OT) and CRDTs (Conflict-free Replicated Data Types)
+        - 
+- Deep dives
+- References
+    - [Neetcode YT](https://www.youtube.com/watch?v=9JKBlkwg0yM&t=2s)
 
 ### References
 - [Hello Interview](https://www.hellointerview.com/learn/system-design/answer-keys/leetcode)

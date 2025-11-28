@@ -218,8 +218,28 @@ Integer element = (Integer) stack.peek(); // It does not delete element
 
 ### Monotonic stack 
 
-- Monitonic stack presers array element sequence either in asc or desc order.
+- A monotonic stack is a specialized stack data structure that maintains its elements in a specific order—either strictly increasing or strictly decreasing from bottom to top
 - Many questions can be solved using monotonic stack 
+- How It Works 
+    - The key operation happens during the push phase
+    - Before pushing a new element, compare it with the top of the stack
+    - If the new element violates the monotonic property, pop elements from the stack until the property is satisfied
+    - Push the new element onto the stack
+- Each element is pushed and popped at most once, resulting in O(n) time complexity for processing n elements. 
+- Example Questions can be solved with monotonic stack
+    - https://leetcode.com/discuss/post/5148505/monotonic-stack-guide-list-of-problems-b-rnuj/
+    - Next Greater Element
+    - Next Smaller Element
+    - Trapping Rain Water
+    - Largest Rectangle in Histogram
+        - Intuition: For each bar in the histogram, the maximum rectangle with that bar as the minimum height extends left and right until it meets a shorter bar. The key is efficiently finding these left and right boundaries for every bar
+        - The monotonic stack maintains bars in increasing order of height by storing their indices. When we encounter a shorter bar, we know it acts as the right boundary for all taller bars currently in the stack
+        - One of the approach: MAXi((nextSmallerElementIndex - previousSmallerElementIndex - 1 ) * height[i])
+        - 2 Pass Algorithm: It calculates the NPE of top element in single pass only
+            - When I am removing any element from stack that means I found an element which is smaller than top, which is NSE of top element.
+            - Previous smaller element is stored in the stack itself. So while popping the top most element in stack is PreviousSmallerElement
+- monotonic stacks typically store **indices rather than values**. This allows you to look up values from the original array 
+while also calculating distances between elements
 
 ```java
 class Solution {

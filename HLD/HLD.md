@@ -190,6 +190,10 @@ Use case for Document DB..
     - R + W <= N --> Eventual consistency
 - For large file uploads from client device, preferrable approach is to request presigned url from server and client directly upload data in chunks to server avoiding data passthrough from application servers.
   - Store chunks in temp storage and once all the chunks are uploaded combine and move them to permanant storage as a single file.
+- For Postgres DB PgBouncer is a small component which can help with connection pooling and sits in-between application and database. It provides 3 kinds of pooling
+  - Session : Single connection for entire session. Lowest Performace
+  - Transaction : Connection for single transaction and then connection is returned.
+  - Statement level: Statement level connection and returned immediately. Highest performance. doesn't support multi-statement transactions
 
 # Vertical vs Horizontal Scaling
 - Vertical: Buying bigger machines
@@ -207,7 +211,8 @@ Use case for Document DB..
 
 - CAP theorem: Any n/w shared system can not have all 3 properties. Need to sacrifice one of them
   - We have all 3 Characteristics as long as there is no network failure.
-  - If partition happend then non-sync nodes will become unavailable and may return error to connected clients. 
+  - If partition happend then non-sync nodes will become unavailable and may return error to connected clients.
+  - Practically impossible because network failure is unavoidable. So we need to choose between Consistency and Availability
   - CP system : Availavility is sacrified when Partition happens in distributed system.
     - Useful in Banking system
     - MongoDB, Apache HBase, Couchbase, Redis
@@ -218,6 +223,10 @@ Use case for Document DB..
   - CA System: 
     - CS database cant exists in distributed systems except MySQL Dbs
     - Ex. PostgreSQL, MySQL --> Microsoft SQL Server, Oracle, MySQL
+  - Consistency Models
+    - Strong Consistency
+    - Eventual Consistency
+    - Casual Consistency
 
 - PACELC theorem: PACELC theorem is an extension to the CAP theorem. It states that in case of network partitioning (P) in a distributed computer system, one has to choose between availability (A) and consistency (C) (as per the CAP theorem), but else (E), even when the system is running normally in the absence of partitions, one has to choose between latency (L) and consistency (C).
 
@@ -543,9 +552,9 @@ OK
 
 |Strategy|Details|
 |-|-|
-|Read through|..|
+|Read through|Read from cache -> If not found read from DB -> Update cache -> return result|
 |Read ahead|..|
-|Write through|First write in Cache, the in DB|
+|Write through|First write in Cache, then in DB|
 |Write back|Data is updated in Cache and later updated in DB|
 
 
@@ -597,6 +606,28 @@ OK
 ## LWW - Latest Write wins
 - Write with latest timestamp is overriden by server.
 - Chances of data loss if concurrent update happens to update same key
+
+## Message Queue vs Distributed Log
+- Message Queue
+  - A message is processed and its gone
+  - Good for distibuted tasks
+- Distributed Log
+  - A message is preserved and can be read by multiple subscribers
+
+## Change Data Capture - CDC Pipeline
+- Stream data from Source to Queue
+- Like Debezium is an open-source Change Data Capture (CDC) platform.
+- 
+
+## Monilith to Microservice
+- Low Business Critical
+- Few and clear dependencies
+- Clear and Bounded domain - Single, Well defined responsibility
+- Problems
+  - Inter Service Communication
+  - Distributed transactions
+- The Strangler Fig Pattern
+
 
 # References
 - https://github.com/donnemartin/system-design-primer **VERY IMPORTANT**
