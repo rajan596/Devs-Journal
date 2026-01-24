@@ -32,3 +32,4 @@
     - If one container dies -> restart it
     - New code update -> deploy new ones and kill previous all containers
 - That means someone is required to keep an eye on all containers and manage them. This is where **Kubernetes** comes to the rescue
+- 
